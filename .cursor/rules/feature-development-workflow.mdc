@@ -1,0 +1,26 @@
+---
+alwaysApply: true
+---
+
+# 15-feature-development-workflow.mdc
+
+---
+description: Feature implementation workflow
+---
+
+Before implementing features:
+
+1. Identify affected domain.
+2. Check existing patterns.
+3. Define interfaces.
+4. Consider security.
+5. Add tests.
+6. Update documentation.
+
+Prefer:
+
+Small incremental changes.
+
+Avoid:
+
+Large unrelated modifications.

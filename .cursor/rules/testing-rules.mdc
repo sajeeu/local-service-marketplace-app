@@ -1,0 +1,28 @@
+---
+alwaysApply: true
+---
+
+# 10-testing-rules.mdc
+
+---
+description: Testing requirements
+---
+
+Testing is part of architecture.
+
+Include:
+
+- Unit tests
+- Integration tests
+- API tests
+- End-to-end tests
+
+Critical user flows require coverage:
+
+- Registration
+- Login
+- Listing creation
+- Search
+- Booking
+- Payment
+- Reviews

@@ -1,0 +1,27 @@
+---
+alwaysApply: true
+---
+
+# 14-repository-organization-rules.mdc
+
+---
+description: Repository structure rules
+---
+
+Repository must reinforce architecture.
+
+Separate:
+
+Frontend:
+- UI
+- State
+- Features
+- Client services
+
+Backend:
+- API
+- Domains
+- Services
+- Persistence
+
+Avoid unnecessary cross-module dependencies.

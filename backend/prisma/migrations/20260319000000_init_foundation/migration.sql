@@ -1,0 +1,3 @@
+-- Phase 0 foundation baseline.
+-- No business tables yet. Establishes migrate deploy path for PostgreSQL.
+-- Future phases add domain models via additive migrations.

@@ -1,0 +1,36 @@
+---
+alwaysApply: true
+---
+
+# 00-project-foundation.mdc
+
+---
+description: Core project context and non-negotiable principles
+alwaysApply: true
+---
+
+# Local Service Marketplace Foundation
+
+This project is a mobile-first, API-first local service marketplace.
+
+Technology:
+- Flutter frontend
+- TypeScript backend
+- REST APIs
+
+Primary goals:
+- Long-term maintainability
+- Modular architecture
+- Scalability
+- Security
+- Fast user experience
+
+Architectural priorities:
+
+1. Maintain clear domain boundaries.
+2. Keep backend as the source of truth.
+3. Prefer additive changes over disruptive redesign.
+4. Keep modules independently evolvable.
+5. Build production-quality code from the beginning.
+
+Never optimize for short-term speed at the cost of architectural stability.

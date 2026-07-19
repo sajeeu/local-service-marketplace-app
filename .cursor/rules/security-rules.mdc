@@ -1,0 +1,25 @@
+---
+alwaysApply: true
+---
+
+# 07-security-rules.mdc
+
+---
+description: Security requirements
+alwaysApply: true
+---
+
+Security requirements:
+
+- Authentication before authorization.
+- Least privilege access.
+- Server-side validation.
+- Secure credential storage.
+- Encrypt sensitive communication.
+- Protect private data.
+
+Never:
+- Trust client input.
+- Log secrets.
+- Expose internal exceptions.
+- Skip authorization checks.

@@ -1,0 +1,23 @@
+---
+alwaysApply: true
+---
+
+# 19-security-review-agent.mdc
+
+---
+description: Security review behavior
+---
+
+Review implementations for:
+
+- Authentication issues
+- Authorization gaps
+- Data exposure
+- Injection risks
+- Unsafe assumptions
+
+Provide:
+
+- Finding
+- Severity
+- Recommended fix

@@ -1,0 +1,20 @@
+---
+alwaysApply: true
+---
+
+# 13-documentation-rules.mdc
+
+---
+description: Documentation standards
+---
+
+Maintain documentation for:
+
+- Architecture decisions
+- APIs
+- Business rules
+- Deployment
+- Operations
+- Known limitations
+
+Document why decisions exist, not only what was implemented.

@@ -1,0 +1,36 @@
+---
+alwaysApply: true
+---
+
+# 01-architecture-principles.mdc
+
+---
+description: Global architecture rules
+alwaysApply: true
+---
+
+Follow these principles:
+
+- Clean Architecture
+- SOLID principles
+- Separation of concerns
+- Single responsibility
+- Dependency inversion
+- Composition over inheritance
+- Strong typing
+- Explicit interfaces
+- High cohesion
+- Low coupling
+
+Organize software around business capabilities, not technical folders.
+
+Avoid:
+- Shared global logic
+- Circular dependencies
+- Hidden side effects
+- Large coupled modules
+
+Every module should have:
+- Clear responsibility
+- Clear ownership
+- Defined interfaces

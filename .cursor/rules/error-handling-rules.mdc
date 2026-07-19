@@ -1,0 +1,27 @@
+---
+alwaysApply: true
+---
+
+# 11-error-handling-rules.mdc
+
+---
+description: Error handling standards
+---
+
+Errors must be:
+
+- Predictable
+- Consistent
+- Actionable
+- Traceable
+
+Handle separately:
+
+- Validation errors
+- Authentication failures
+- Authorization failures
+- Conflicts
+- Missing resources
+- Infrastructure failures
+
+Never expose internal implementation details.

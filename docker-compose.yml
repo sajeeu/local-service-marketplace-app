@@ -1,0 +1,23 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    # Unique name to avoid collision with sibling repo `local-service-marketplace`
+    container_name: lsm-app-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-lsm}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-lsm_dev_password}
+      POSTGRES_DB: ${POSTGRES_DB:-lsm_dev}
+    ports:
+      # 5434 avoids common local conflicts (menu-api on 5432, sibling LSM on 5433)
+      - "${POSTGRES_PORT:-5434}:5432"
+    volumes:
+      - lsm_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-lsm} -d ${POSTGRES_DB:-lsm_dev}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  lsm_postgres_data:

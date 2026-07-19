@@ -1,0 +1,40 @@
+---
+alwaysApply: true
+---
+
+# 03-backend-typescript-rules.mdc
+
+---
+description: Backend implementation standards
+globs:
+- "backend/**"
+- "server/**"
+---
+
+Backend is the authoritative business layer.
+
+Responsibilities:
+
+- Business rules
+- Validation
+- Authentication
+- Authorization
+- Transactions
+- Integrations
+
+Rules:
+
+- Keep controllers thin.
+- Keep business logic in domain services.
+- Use dependency injection.
+- Use typed interfaces.
+- Validate all external input.
+- Avoid exposing database models directly.
+
+Every feature should define:
+
+- Domain model
+- Service layer
+- API contract
+- Validation
+- Tests

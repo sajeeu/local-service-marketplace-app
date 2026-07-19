@@ -1,0 +1,18 @@
+---
+alwaysApply: true
+---
+
+# 17-api-contract-maintenance.mdc
+
+---
+description: API compatibility rules
+---
+
+API changes must consider:
+
+- Existing clients
+- Backward compatibility
+- Versioning
+- Migration strategy
+
+Never silently break existing contracts.

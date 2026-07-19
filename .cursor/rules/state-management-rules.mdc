@@ -1,0 +1,39 @@
+---
+alwaysApply: true
+---
+
+# 05-state-management-rules.mdc
+
+---
+description: State ownership rules
+globs:
+- "**/*.dart"
+---
+
+Classify state:
+
+UI State:
+- Loading
+- Dialog visibility
+- Tabs
+- Temporary interaction
+
+Session State:
+- Authentication
+- User identity
+- Permissions
+
+Domain State:
+- Providers
+- Listings
+- Bookings
+- Reviews
+
+Remote State:
+- Backend synchronized data
+
+Persistent State:
+- Preferences
+- Settings
+
+Every state variable must have clear ownership.

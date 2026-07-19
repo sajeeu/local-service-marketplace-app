@@ -1,0 +1,27 @@
+---
+alwaysApply: true
+---
+
+# 04-flutter-frontend-rules.mdc
+
+---
+description: Flutter architecture rules
+globs:
+- "frontend/**"
+- "app/**"
+---
+
+Flutter application rules:
+
+- Use feature-based organization.
+- Separate UI from business logic.
+- Keep widgets focused.
+- Reuse components.
+- Maintain predictable state flow.
+
+Never:
+- Put business rules inside widgets.
+- Trust client validation as security.
+- Duplicate backend logic.
+
+The client consumes backend authority.

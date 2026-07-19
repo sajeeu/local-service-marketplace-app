@@ -1,0 +1,25 @@
+---
+alwaysApply: true
+---
+
+# 09-code-quality-rules.mdc
+
+---
+description: Coding standards
+alwaysApply: true
+---
+
+Prioritize:
+
+- Readability
+- Explicit behavior
+- Small changes
+- Clear naming
+- Maintainability
+
+Avoid:
+
+- Clever solutions
+- Duplicate code
+- Large refactors without reason
+- Hidden dependencies

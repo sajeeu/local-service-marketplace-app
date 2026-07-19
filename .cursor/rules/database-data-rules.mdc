@@ -1,0 +1,23 @@
+---
+alwaysApply: true
+---
+
+# 08-database-data-rules.mdc
+
+---
+description: Data modeling principles
+---
+
+Database design should support:
+
+- Domain ownership
+- Data consistency
+- Future growth
+- Migration safety
+
+Rules:
+
+- Avoid premature optimization.
+- Preserve relationships clearly.
+- Keep domain models understandable.
+- Protect data integrity.

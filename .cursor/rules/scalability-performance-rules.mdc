@@ -1,0 +1,25 @@
+---
+alwaysApply: true
+---
+
+# 16-scalability-performance-rules.mdc
+
+---
+description: Scalability requirements
+---
+
+Design for:
+
+- Horizontal scaling
+- Stateless services
+- Efficient queries
+- Caching readiness
+- Background processing
+- Async workflows
+
+Performance considerations:
+
+- Reduce unnecessary requests.
+- Optimize payload sizes.
+- Support pagination.
+- Lazy load expensive resources.

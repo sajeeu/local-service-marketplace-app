@@ -1,0 +1,31 @@
+---
+alwaysApply: true
+---
+
+# 12-logging-monitoring-rules.mdc
+
+---
+description: Logging standards
+---
+
+Logs must be:
+
+- Structured
+- Searchable
+- Contextual
+
+Track:
+
+- Authentication events
+- Authorization failures
+- Payments
+- Bookings
+- Admin actions
+- Integration failures
+- Exceptions
+
+Never log:
+
+- Passwords
+- Tokens
+- Private information

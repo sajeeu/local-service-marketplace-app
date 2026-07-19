@@ -1,0 +1,75 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  backend:
+    name: Backend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: .
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build shared package
+        run: npm run shared:build
+
+      - name: Generate Prisma client
+        working-directory: backend
+        run: npx prisma generate
+        env:
+          DATABASE_URL: postgresql://lsm:lsm_dev_password@localhost:5432/lsm_dev?schema=public
+
+      - name: Lint
+        run: npm run backend:lint
+
+      - name: Unit tests
+        run: npm run backend:test
+
+      - name: E2E tests
+        run: npm run test:e2e --workspace=backend
+        env:
+          DATABASE_URL: postgresql://lsm:lsm_dev_password@localhost:5432/lsm_dev?schema=public
+          APP_ENV: test
+          NODE_ENV: test
+          LOG_LEVEL: silent
+
+      - name: Build
+        run: npm run backend:build
+
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Resolve dependencies
+        run: flutter pub get
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Test
+        run: flutter test

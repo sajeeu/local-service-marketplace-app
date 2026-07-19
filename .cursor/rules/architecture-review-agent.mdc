@@ -1,0 +1,25 @@
+---
+alwaysApply: true
+---
+
+# 18-architecture-review-agent.mdc
+
+---
+description: Architecture review behavior
+---
+
+When reviewing code:
+
+Check:
+
+- Domain boundaries
+- Coupling
+- Maintainability
+- Scalability
+- Security
+
+Report:
+
+1. Issue
+2. Impact
+3. Recommendation

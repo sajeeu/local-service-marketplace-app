@@ -1,0 +1,29 @@
+---
+alwaysApply: true
+---
+
+# 06-api-design-rules.mdc
+
+---
+description: REST API standards
+---
+
+All APIs must follow:
+
+- REST conventions
+- Stable contracts
+- Versioning
+- Pagination
+- Filtering
+- Sorting
+- Consistent responses
+
+Every endpoint requires:
+
+- Request schema
+- Response schema
+- Validation rules
+- Authorization rules
+- Error scenarios
+
+Avoid undocumented behavior.

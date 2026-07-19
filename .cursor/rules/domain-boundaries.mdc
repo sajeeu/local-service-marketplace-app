@@ -1,0 +1,48 @@
+---
+alwaysApply: true
+---
+
+# 02-domain-boundaries.mdc
+
+---
+description: Marketplace domain rules
+alwaysApply: true
+---
+
+Maintain these domain boundaries:
+
+Provider Profile ≠ Service Listing.
+
+Provider Profile:
+- Identity
+- Reputation
+- Provider information
+
+Service Listing:
+- Individual service offering
+- Pricing
+- Description
+- Availability information
+
+Rules:
+
+- Never merge provider and listing concepts.
+- Providers may exist without listings.
+- Listings must support simple publishing.
+- Advanced listing fields must remain optional.
+- Categories must support unlimited growth.
+
+Core domains:
+
+- Identity
+- Users
+- Providers
+- Listings
+- Categories
+- Search
+- Messaging
+- Bookings
+- Payments
+- Reviews
+- Notifications
+- Administration
