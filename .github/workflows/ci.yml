@@ -46,6 +46,10 @@ jobs:
           APP_ENV: test
           NODE_ENV: test
           LOG_LEVEL: silent
+          JWT_ACCESS_SECRET: test_access_secret_at_least_32_chars_long
+          JWT_REFRESH_SECRET: test_refresh_secret_at_least_32_chars_long
+          JWT_ACCESS_TTL: 15m
+          JWT_REFRESH_TTL: 7d
 
       - name: Build
         run: npm run backend:build

@@ -1,5 +1,9 @@
 import { z } from 'zod';
 
+const jwtSecretSchema = z
+  .string()
+  .min(32, 'JWT secrets must be at least 32 characters');
+
 export const envSchema = z.object({
   NODE_ENV: z
     .enum(['development', 'test', 'staging', 'production'])
@@ -20,6 +24,10 @@ export const envSchema = z.object({
     .enum(['true', 'false'])
     .default('false')
     .transform((value) => value === 'true'),
+  JWT_ACCESS_SECRET: jwtSecretSchema,
+  JWT_ACCESS_TTL: z.string().min(1).default('15m'),
+  JWT_REFRESH_SECRET: jwtSecretSchema,
+  JWT_REFRESH_TTL: z.string().min(1).default('7d'),
 });
 
 export type EnvConfig = z.infer<typeof envSchema>;

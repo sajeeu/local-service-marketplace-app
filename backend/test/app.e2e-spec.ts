@@ -29,6 +29,11 @@ describe('API foundation (e2e)', () => {
     process.env.NODE_ENV = 'test';
     process.env.CORS_ORIGINS = 'http://localhost:3000';
     process.env.LOG_LEVEL = 'silent';
+    process.env.JWT_ACCESS_SECRET = 'test_access_secret_at_least_32_chars_long';
+    process.env.JWT_REFRESH_SECRET =
+      'test_refresh_secret_at_least_32_chars_long';
+    process.env.JWT_ACCESS_TTL ??= '15m';
+    process.env.JWT_REFRESH_TTL ??= '7d';
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],

@@ -44,6 +44,15 @@ Health:
 - Liveness: `GET /api/v1/health`
 - Readiness: `GET /api/v1/health/ready`
 
+Identity (Phase 1):
+
+- `POST /api/v1/auth/register`
+- `POST /api/v1/auth/login`
+- `POST /api/v1/auth/logout`
+- `POST /api/v1/auth/refresh`
+- `GET /api/v1/users/me`
+- `PATCH /api/v1/users/me`
+
 ### 3. Frontend
 
 ```bash
@@ -51,6 +60,8 @@ cd frontend
 flutter pub get
 flutter run --dart-define=API_BASE_URL=http://localhost:3000/api/v1
 ```
+
+Auth screens: `/login`, `/register`. Tokens are stored with `flutter_secure_storage`.
 
 ## Environments
 
@@ -66,6 +77,10 @@ Configuration is environment-driven (no hardcoded secrets).
 | `THROTTLE_TTL_MS` / `THROTTLE_LIMIT` | Rate limit window and max requests |
 | `BODY_LIMIT` | Max request body size |
 | `TRUST_PROXY` | Enable when behind a reverse proxy |
+| `JWT_ACCESS_SECRET` | Access token signing secret (min 32 chars) |
+| `JWT_ACCESS_TTL` | Access token lifetime (default `15m`) |
+| `JWT_REFRESH_SECRET` | Refresh token pepper (min 32 chars) |
+| `JWT_REFRESH_TTL` | Refresh token lifetime (default `7d`) |
 
 Staging and production use the same keys with different values (see `backend/.env.example`).
 
@@ -78,11 +93,13 @@ packages/shared/   Shared API types
 docs/architecture/ Architecture decisions
 ```
 
-## Phase 0 scope
+## Current phase
 
-This repository currently contains **project foundation only**.
+**Phase 1 — Identity & User Foundation** is implemented.
 
-Out of scope until later phases: authentication, users, providers, listings, search, bookings, payments, reviews, and related business features.
+In scope: user accounts, authentication, refresh sessions, roles foundation, account status.
+
+Out of scope until later phases: provider/customer profiles, listings, search, bookings, payments, reviews.
 
 ## Scripts
 
@@ -97,3 +114,4 @@ Out of scope until later phases: authentication, users, providers, listings, sea
 ## Documentation
 
 - [ADR-0001 Phase 0 Foundation](docs/architecture/ADR-0001-phase-0-foundation.md)
+- [ADR-0002 Phase 1 Identity](docs/architecture/ADR-0002-phase-1-identity.md)

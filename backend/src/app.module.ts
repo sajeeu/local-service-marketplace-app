@@ -10,6 +10,9 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { ResponseEnvelopeInterceptor } from './common/interceptors/response-envelope.interceptor';
 import { REQUEST_ID_HEADER } from './common/middleware/request-id.middleware';
 import { HealthModule } from './health/health.module';
+import { JwtAuthGuard } from './modules/identity/authorization/jwt-auth.guard';
+import { RolesGuard } from './modules/identity/authorization/roles.guard';
+import { IdentityModule } from './modules/identity/identity.module';
 import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
@@ -78,6 +81,7 @@ import { PrismaModule } from './prisma/prisma.module';
     }),
     PrismaModule,
     HealthModule,
+    IdentityModule,
   ],
   providers: [
     {
@@ -91,6 +95,14 @@ import { PrismaModule } from './prisma/prisma.module';
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
     },
   ],
 })

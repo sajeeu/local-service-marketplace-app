@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/core/config/app_config.dart';
 import 'package:frontend/core/errors/error_feedback.dart';
 import 'package:frontend/core/network/api_client.dart';
+import 'package:frontend/core/state/session_provider.dart';
 import 'package:frontend/core/theme/app_tokens.dart';
 import 'package:frontend/core/widgets/app_scaffold.dart';
 
@@ -26,6 +27,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         '/health',
         parseData: (raw) =>
             raw is Map<String, dynamic> ? raw : <String, dynamic>{},
+        skipAuth: true,
       );
       setState(() {
         _healthStatus = envelope.data?['status']?.toString() ?? 'unknown';
@@ -43,8 +45,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final session = ref.watch(sessionProvider).value;
+    final email = session?.user?.email;
+
     return AppScaffold(
       title: AppConfig.current.appName,
+      actions: [
+        IconButton(
+          tooltip: 'Sign out',
+          onPressed: () => ref.read(sessionProvider.notifier).logout(),
+          icon: const Icon(Icons.logout),
+        ),
+      ],
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -54,7 +66,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
           const SizedBox(height: AppSpacing.sm),
           Text(
-            'Phase 0 bootstrap shell. Business features arrive in later phases.',
+            email == null
+                ? 'Signed in. Marketplace profiles arrive in Phase 2.'
+                : 'Signed in as $email',
             style: Theme.of(context).textTheme.bodyLarge,
           ),
           const SizedBox(height: AppSpacing.lg),

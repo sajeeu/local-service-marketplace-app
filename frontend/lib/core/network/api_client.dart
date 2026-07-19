@@ -3,9 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/core/config/app_config.dart';
 import 'package:frontend/core/errors/app_exception.dart';
 import 'package:frontend/core/network/api_envelope.dart';
+import 'package:frontend/core/state/token_store.dart';
 
 final apiClientProvider = Provider<ApiClient>((ref) {
-  return ApiClient(config: AppConfig.current);
+  return ApiClient(
+    config: AppConfig.current,
+    tokenStore: ref.watch(tokenStoreProvider),
+  );
 });
 
 /// Thin HTTP client that understands the backend API envelope.
@@ -13,8 +17,10 @@ final apiClientProvider = Provider<ApiClient>((ref) {
 class ApiClient {
   ApiClient({
     required AppConfig config,
+    required TokenStore tokenStore,
     Dio? dio,
-  }) : _dio = dio ??
+  })  : _tokenStore = tokenStore,
+        _dio = dio ??
             Dio(
               BaseOptions(
                 baseUrl: config.apiBaseUrl,
@@ -25,19 +31,77 @@ class ApiClient {
                   'Content-Type': 'application/json',
                 },
               ),
-            );
+            ) {
+    _dio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) async {
+          final skipAuth = options.extra['skipAuth'] == true;
+          if (!skipAuth) {
+            final token = await _tokenStore.readAccessToken();
+            if (token != null && token.isNotEmpty) {
+              options.headers['Authorization'] = 'Bearer $token';
+            }
+          }
+          handler.next(options);
+        },
+      ),
+    );
+  }
 
   final Dio _dio;
+  final TokenStore _tokenStore;
 
   Future<ApiEnvelope<T>> get<T>(
     String path, {
     Map<String, dynamic>? queryParameters,
     T? Function(Object? raw)? parseData,
+    bool skipAuth = false,
   }) async {
     try {
       final response = await _dio.get<Map<String, dynamic>>(
         path,
         queryParameters: queryParameters,
+        options: Options(extra: {'skipAuth': skipAuth}),
+      );
+      return _parseEnvelope(response.data, parseData: parseData);
+    } on DioException catch (error) {
+      throw _mapDioException(error);
+    } catch (_) {
+      throw const UnexpectedAppException();
+    }
+  }
+
+  Future<ApiEnvelope<T>> post<T>(
+    String path, {
+    Object? data,
+    T? Function(Object? raw)? parseData,
+    bool skipAuth = false,
+  }) async {
+    try {
+      final response = await _dio.post<Map<String, dynamic>>(
+        path,
+        data: data,
+        options: Options(extra: {'skipAuth': skipAuth}),
+      );
+      return _parseEnvelope(response.data, parseData: parseData);
+    } on DioException catch (error) {
+      throw _mapDioException(error);
+    } catch (_) {
+      throw const UnexpectedAppException();
+    }
+  }
+
+  Future<ApiEnvelope<T>> patch<T>(
+    String path, {
+    Object? data,
+    T? Function(Object? raw)? parseData,
+    bool skipAuth = false,
+  }) async {
+    try {
+      final response = await _dio.patch<Map<String, dynamic>>(
+        path,
+        data: data,
+        options: Options(extra: {'skipAuth': skipAuth}),
       );
       return _parseEnvelope(response.data, parseData: parseData);
     } on DioException catch (error) {
