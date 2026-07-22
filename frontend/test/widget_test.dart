@@ -143,8 +143,10 @@ void main() {
 
     await tester.pumpAndSettle();
 
-    expect(find.text('Sign in'), findsWidgets);
-    expect(find.text('Welcome back'), findsOneWidget);
+    expect(find.text('Welcome Back'), findsOneWidget);
+    expect(find.text('Remember me'), findsOneWidget);
+    expect(find.text('Sign In'), findsOneWidget);
+    expect(find.textContaining('Local Service Marketplace'), findsWidgets);
   });
 
   testWidgets('authenticated app opens home shell', (tester) async {
@@ -206,7 +208,8 @@ void main() {
     );
 
     await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(FilledButton, 'Sign in'));
+    await tester.ensureVisible(find.text('Sign In'));
+    await tester.tap(find.text('Sign In'));
     await tester.pumpAndSettle();
 
     expect(find.text('Email is required'), findsOneWidget);

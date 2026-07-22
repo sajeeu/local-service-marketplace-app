@@ -33,6 +33,9 @@ flutter run --dart-define=API_BASE_URL=http://10.0.2.2:3000/api/v1
 | --- | --- |
 | `/login` | Sign in |
 | `/register` | Create account |
+| `/forgot-password` | Request password reset |
+| `/reset-password` | Set a new password |
+| `/password-reset-success` | Password reset confirmation |
 | `/` | Home (authenticated) — profile entry points |
 | `/customer-profile` | View own customer profile |
 | `/customer-profile/create` | Create customer profile |
