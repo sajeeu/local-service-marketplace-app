@@ -8,6 +8,10 @@ import 'package:frontend/core/state/session_provider.dart';
 import 'package:frontend/core/state/token_store.dart';
 import 'package:frontend/features/auth/data/auth_api.dart';
 import 'package:frontend/features/auth/data/auth_models.dart';
+import 'package:frontend/features/customers/data/customer_profile_api.dart';
+import 'package:frontend/features/customers/data/customer_profile_models.dart';
+import 'package:frontend/features/providers/data/provider_profile_api.dart';
+import 'package:frontend/features/providers/data/provider_profile_models.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class _HydratedSession extends SessionNotifier {
@@ -59,6 +63,66 @@ class _NoopAuthApi implements AuthApi {
   }
 }
 
+class _MissingProviderProfileApi implements ProviderProfileApi {
+  @override
+  Future<ProviderProfile> create(CreateProviderProfileInput input) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<ProviderProfile> getMe() async {
+    throw const ApiAppException(
+      message: 'Provider profile not found',
+      code: 'NOT_FOUND',
+    );
+  }
+
+  @override
+  Future<ProviderProfile> update(UpdateProviderProfileInput input) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<ProviderProfile> deactivate() {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<ProviderProfile> restore() {
+    throw UnimplementedError();
+  }
+}
+
+class _MissingCustomerProfileApi implements CustomerProfileApi {
+  @override
+  Future<CustomerProfile> create(CreateCustomerProfileInput input) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<CustomerProfile> getMe() async {
+    throw const ApiAppException(
+      message: 'Customer profile not found',
+      code: 'NOT_FOUND',
+    );
+  }
+
+  @override
+  Future<CustomerProfile> update(UpdateCustomerProfileInput input) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<CustomerProfile> deactivate() {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<CustomerProfile> restore() {
+    throw UnimplementedError();
+  }
+}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -99,6 +163,10 @@ void main() {
           sharedPreferencesProvider.overrideWithValue(prefs),
           tokenStoreProvider.overrideWithValue(InMemoryTokenStore()),
           authApiProvider.overrideWithValue(_NoopAuthApi()),
+          providerProfileApiProvider
+              .overrideWithValue(_MissingProviderProfileApi()),
+          customerProfileApiProvider
+              .overrideWithValue(_MissingCustomerProfileApi()),
           sessionProvider.overrideWith(
             () => _HydratedSession(
               const SessionState(
@@ -116,8 +184,10 @@ void main() {
 
     await tester.pumpAndSettle();
 
-    expect(find.text('Foundation ready'), findsOneWidget);
+    expect(find.text('Marketplace profiles'), findsOneWidget);
     expect(find.textContaining('user@example.com'), findsOneWidget);
+    expect(find.text('Create customer profile'), findsOneWidget);
+    expect(find.text('Create provider profile'), findsOneWidget);
   });
 
   testWidgets('login form shows validation errors', (tester) async {

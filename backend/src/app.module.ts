@@ -12,7 +12,9 @@ import { REQUEST_ID_HEADER } from './common/middleware/request-id.middleware';
 import { HealthModule } from './health/health.module';
 import { JwtAuthGuard } from './modules/identity/authorization/jwt-auth.guard';
 import { RolesGuard } from './modules/identity/authorization/roles.guard';
+import { CustomersModule } from './modules/customers/customers.module';
 import { IdentityModule } from './modules/identity/identity.module';
+import { ProvidersModule } from './modules/providers/providers.module';
 import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
@@ -82,6 +84,8 @@ import { PrismaModule } from './prisma/prisma.module';
     PrismaModule,
     HealthModule,
     IdentityModule,
+    ProvidersModule,
+    CustomersModule,
   ],
   providers: [
     {

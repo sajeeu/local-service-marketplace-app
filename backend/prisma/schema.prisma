@@ -1,5 +1,5 @@
-// Prisma schema — Phase 1 Identity models.
-// Provider/customer marketplace profiles arrive in Phase 2+.
+// Prisma schema — Phase 1 Identity + Phase 2 Provider/Customer Profiles.
+// Listings, categories, bookings, and other marketplace domains arrive later.
 
 generator client {
   provider = "prisma-client-js"
@@ -22,16 +22,28 @@ enum UserStatus {
   DELETED
 }
 
+enum ProfileStatus {
+  ACTIVE
+  DEACTIVATED
+}
+
+enum ProfileVisibility {
+  PUBLIC
+  PRIVATE
+}
+
 model User {
-  id           String         @id @default(cuid())
-  email        String         @unique
-  passwordHash String
-  displayName  String?
-  role         UserRole       @default(CUSTOMER)
-  status       UserStatus     @default(ACTIVE)
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
-  refreshTokens RefreshToken[]
+  id              String           @id @default(cuid())
+  email           String           @unique
+  passwordHash    String
+  displayName     String?
+  role            UserRole         @default(CUSTOMER)
+  status          UserStatus       @default(ACTIVE)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  refreshTokens   RefreshToken[]
+  providerProfile ProviderProfile?
+  customerProfile CustomerProfile?
 
   @@index([status])
 }
@@ -48,4 +60,45 @@ model RefreshToken {
 
   @@index([userId])
   @@index([expiresAt])
+}
+
+/// Marketplace business identity for a service provider. Not a service listing.
+model ProviderProfile {
+  id               String            @id @default(cuid())
+  userId           String            @unique
+  displayName      String
+  businessName     String?
+  description      String?
+  contactEmail     String?
+  contactPhone     String?
+  websiteUrl       String?
+  logoUrl          String?
+  coverImageUrl    String?
+  languages        String[]          @default([])
+  businessSettings Json              @default("{}")
+  visibility       ProfileVisibility @default(PRIVATE)
+  status           ProfileStatus     @default(ACTIVE)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([status, visibility])
+}
+
+/// Marketplace customer identity. Separate from User auth and ProviderProfile.
+model CustomerProfile {
+  id            String        @id @default(cuid())
+  userId        String        @unique
+  displayName   String
+  avatarUrl     String?
+  contactEmail  String?
+  contactPhone  String?
+  preferences   Json          @default("{}")
+  savedSettings Json          @default("{}")
+  status        ProfileStatus @default(ACTIVE)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([status])
 }

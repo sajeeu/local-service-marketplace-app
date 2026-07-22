@@ -14,18 +14,26 @@ flutter run --dart-define=API_BASE_URL=http://localhost:3000/api/v1
 | Kind | Approach |
 | --- | --- |
 | UI | Widget-local / Riverpod UI providers |
-| Session | `sessionProvider` (`AsyncNotifier`) — auth identity + tokens |
-| Remote | `ApiClient` + feature APIs (`AuthApi`) |
+| Session | `sessionProvider` — auth identity + tokens only |
+| Provider profile | `providerProfileProvider` — marketplace provider identity |
+| Customer profile | `customerProfileProvider` — marketplace customer identity |
+| Remote | `ApiClient` + feature APIs |
 | Persistent prefs | `PreferencesStore` via `shared_preferences` |
 | Secure tokens | `TokenStore` via `flutter_secure_storage` |
 
-## Auth routes
+## Routes
 
 | Path | Screen |
 | --- | --- |
 | `/login` | Sign in |
 | `/register` | Create account |
-| `/` | Foundation home (authenticated) |
+| `/` | Home (authenticated) — profile entry points |
+| `/customer-profile` | View own customer profile |
+| `/customer-profile/create` | Create customer profile |
+| `/customer-profile/edit` | Edit customer profile |
+| `/provider-profile` | View own provider profile |
+| `/provider-profile/create` | Create provider profile |
+| `/provider-profile/edit` | Edit provider profile |
 
 Unauthenticated users are redirected to `/login`. Tokens are never stored in SharedPreferences.
 
@@ -36,6 +44,10 @@ lib/
   app/        App shell, router (auth redirects)
   core/       Config, theme, network, errors, session, token store
   features/
-    auth/     Login/register + AuthApi
-    home/     Bootstrap shell
+    auth/       Login/register + AuthApi
+    home/       Authenticated home with profile links
+    customers/  Customer profile data/state/presentation
+    providers/  Provider profile data/state/presentation
 ```
+
+Profile features are intentionally separate from `auth/`. Session state must not absorb marketplace profile fields.

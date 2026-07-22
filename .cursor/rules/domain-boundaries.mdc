@@ -1,7 +1,3 @@
----
-alwaysApply: true
----
-
 # 02-domain-boundaries.mdc
 
 ---
@@ -11,12 +7,22 @@ alwaysApply: true
 
 Maintain these domain boundaries:
 
-Provider Profile ≠ Service Listing.
+User (Identity) ≠ Provider Profile ≠ Customer Profile ≠ Service Listing.
 
-Provider Profile:
-- Identity
-- Reputation
+User (authentication identity):
+- Login credentials
+- Account status
+- Role assignment
+- Must not contain marketplace profile fields
+
+Provider Profile (business identity):
 - Provider information
+- Display / contact / media / languages / settings / visibility
+- Reputation belongs to future phases, not listings
+
+Customer Profile (customer identity):
+- Display / avatar / contact / preferences / settings
+- Must not contain favorites, booking history, or reviews
 
 Service Listing:
 - Individual service offering
@@ -26,7 +32,11 @@ Service Listing:
 
 Rules:
 
+- Never merge User and Profile concepts.
+- Never merge Provider Profile and Customer Profile.
 - Never merge provider and listing concepts.
+- A User may exist without either profile.
+- A User may have a Customer Profile, a Provider Profile, or eventually both.
 - Providers may exist without listings.
 - Listings must support simple publishing.
 - Advanced listing fields must remain optional.
@@ -37,6 +47,7 @@ Core domains:
 - Identity
 - Users
 - Providers
+- Customers
 - Listings
 - Categories
 - Search

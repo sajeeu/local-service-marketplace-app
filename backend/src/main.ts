@@ -2,6 +2,7 @@ import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
 import { Logger } from 'nestjs-pino';
 import { json, urlencoded } from 'express';
@@ -35,9 +36,31 @@ async function bootstrap() {
     .split(',')
     .map((origin) => origin.trim())
     .filter(Boolean);
+  const appEnv = configService.get('APP_ENV', { infer: true });
 
   app.enableCors({
-    origin: corsOrigins,
+    origin: (
+      origin: string | undefined,
+      callback: (err: Error | null, allow?: boolean) => void,
+    ) => {
+      if (!origin) {
+        callback(null, true);
+        return;
+      }
+      if (corsOrigins.includes(origin)) {
+        callback(null, true);
+        return;
+      }
+      // Flutter web uses a random localhost port; allow in development only.
+      if (
+        appEnv === 'development' &&
+        /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)
+      ) {
+        callback(null, true);
+        return;
+      }
+      callback(new Error(`Origin ${origin} not allowed by CORS`), false);
+    },
     credentials: true,
   });
 
@@ -49,11 +72,23 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe(VALIDATION_PIPE_OPTIONS));
 
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle('Local Service Marketplace API')
+    .setDescription(
+      'REST API for the local service marketplace. Responses use the shared { data, error, meta } envelope.',
+    )
+    .setVersion('1')
+    .addBearerAuth()
+    .build();
+  const document = SwaggerModule.createDocument(app, swaggerConfig);
+  SwaggerModule.setup('api/docs', app, document);
+
   const port = configService.get('PORT', { infer: true });
   await app.listen(port);
   logger.log(
     `API listening on port ${port} (env=${configService.get('APP_ENV', { infer: true })})`,
   );
+  logger.log(`OpenAPI docs available at /api/docs`);
 }
 
 void bootstrap();

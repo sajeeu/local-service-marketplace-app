@@ -71,7 +71,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             ),
             const SizedBox(height: AppSpacing.sm),
             Text(
-              'Identity only — marketplace profiles come later.',
+              'Create your login account. Marketplace profiles are managed separately after sign-in.',
               style: Theme.of(context).textTheme.bodyLarge,
             ),
             const SizedBox(height: AppSpacing.lg),

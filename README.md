@@ -39,12 +39,14 @@ npm run backend:dev
 
 API base: `http://localhost:3000/api/v1`
 
+OpenAPI docs: `http://localhost:3000/api/docs`
+
 Health:
 
 - Liveness: `GET /api/v1/health`
 - Readiness: `GET /api/v1/health/ready`
 
-Identity (Phase 1):
+Identity:
 
 - `POST /api/v1/auth/register`
 - `POST /api/v1/auth/login`
@@ -52,6 +54,23 @@ Identity (Phase 1):
 - `POST /api/v1/auth/refresh`
 - `GET /api/v1/users/me`
 - `PATCH /api/v1/users/me`
+
+Provider profiles:
+
+- `POST /api/v1/provider-profiles`
+- `GET /api/v1/provider-profiles/me`
+- `PATCH /api/v1/provider-profiles/me`
+- `POST /api/v1/provider-profiles/me/deactivate`
+- `POST /api/v1/provider-profiles/me/restore`
+- `GET /api/v1/provider-profiles/:id` (public when ACTIVE + PUBLIC)
+
+Customer profiles:
+
+- `POST /api/v1/customer-profiles`
+- `GET /api/v1/customer-profiles/me`
+- `PATCH /api/v1/customer-profiles/me`
+- `POST /api/v1/customer-profiles/me/deactivate`
+- `POST /api/v1/customer-profiles/me/restore`
 
 ### 3. Frontend
 
@@ -61,7 +80,7 @@ flutter pub get
 flutter run --dart-define=API_BASE_URL=http://localhost:3000/api/v1
 ```
 
-Auth screens: `/login`, `/register`. Tokens are stored with `flutter_secure_storage`.
+Auth screens: `/login`, `/register`. Profile screens: `/customer-profile*`, `/provider-profile*`. Tokens are stored with `flutter_secure_storage`.
 
 ## Environments
 
@@ -91,15 +110,17 @@ backend/           NestJS API
 frontend/          Flutter app
 packages/shared/   Shared API types
 docs/architecture/ Architecture decisions
+docs/domain/       Domain boundaries and rules
+docs/database/     Schema and migration notes
 ```
 
 ## Current phase
 
-**Phase 1 — Identity & User Foundation** is implemented.
+**Phase 2 — Provider & Customer Profiles** is implemented.
 
-In scope: user accounts, authentication, refresh sessions, roles foundation, account status.
+In scope: independent provider/customer marketplace identities linked to User, profile CRUD, soft deactivate/restore, public provider read, Flutter profile foundations.
 
-Out of scope until later phases: provider/customer profiles, listings, search, bookings, payments, reviews.
+Out of scope until later phases: categories, service areas, listings, search, bookings, payments, reviews, messaging, file upload storage.
 
 ## Scripts
 
@@ -115,3 +136,6 @@ Out of scope until later phases: provider/customer profiles, listings, search, b
 
 - [ADR-0001 Phase 0 Foundation](docs/architecture/ADR-0001-phase-0-foundation.md)
 - [ADR-0002 Phase 1 Identity](docs/architecture/ADR-0002-phase-1-identity.md)
+- [ADR-0003 Phase 2 Profiles](docs/architecture/ADR-0003-phase-2-profiles.md)
+- [Domain — Profiles](docs/domain/profiles.md)
+- [Database — Phase 2 Profiles](docs/database/phase-2-profiles.md)
