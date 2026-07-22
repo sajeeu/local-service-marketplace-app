@@ -1,0 +1,48 @@
+---
+alwaysApply: true
+---
+
+Every development phase that introduces new database entities must also implement development seed data.
+
+Seed data is part of the implementation, not an optional task.
+
+Requirements
+
+• Create idempotent seed scripts.
+• Running the seed multiple times must never create duplicate records.
+• Seed data must be realistic and production-like.
+• Maintain proper relationships and referential integrity.
+• Organize seeds by module/domain.
+• Support resetting and reseeding the development database.
+• Use deterministic data where practical.
+• Never execute development seeds in production.
+
+Every new entity introduced during a phase must have representative seed data.
+
+Seed data should support:
+
+- UI development
+- Manual testing
+- API testing
+- Integration testing
+- End-to-end testing
+- Demonstrations
+
+Provide commands for:
+
+- Seed database
+- Reset database
+- Clear database
+- Reseed database
+
+Document all commands.
+
+Whenever database models change:
+
+- Update seed scripts.
+- Update documentation.
+- Keep seeds synchronized with schema changes.
+
+Testing should use seeded data whenever appropriate.
+
+Before completing a phase, verify that the entire application functions correctly using only seeded data.

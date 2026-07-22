@@ -1,5 +1,5 @@
-// Prisma schema — Phase 1 Identity + Phase 2 Provider/Customer Profiles.
-// Listings, categories, bookings, and other marketplace domains arrive later.
+// Prisma schema — Phase 1–3: Identity, Profiles, Categories, Maldives Geography, Coverage.
+// Listings, bookings, and other marketplace domains arrive later.
 
 generator client {
   provider = "prisma-client-js"
@@ -30,6 +30,21 @@ enum ProfileStatus {
 enum ProfileVisibility {
   PUBLIC
   PRIVATE
+}
+
+enum CatalogStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum IslandType {
+  CAPITAL
+  CITY
+  INHABITED
+  RESORT
+  AIRPORT
+  INDUSTRIAL
+  OTHER
 }
 
 model User {
@@ -64,8 +79,8 @@ model RefreshToken {
 
 /// Marketplace business identity for a service provider. Not a service listing.
 model ProviderProfile {
-  id               String            @id @default(cuid())
-  userId           String            @unique
+  id               String                   @id @default(cuid())
+  userId           String                   @unique
   displayName      String
   businessName     String?
   description      String?
@@ -74,13 +89,14 @@ model ProviderProfile {
   websiteUrl       String?
   logoUrl          String?
   coverImageUrl    String?
-  languages        String[]          @default([])
-  businessSettings Json              @default("{}")
-  visibility       ProfileVisibility @default(PRIVATE)
-  status           ProfileStatus     @default(ACTIVE)
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
-  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  languages        String[]                 @default([])
+  businessSettings Json                     @default("{}")
+  visibility       ProfileVisibility        @default(PRIVATE)
+  status           ProfileStatus            @default(ACTIVE)
+  createdAt        DateTime                 @default(now())
+  updatedAt        DateTime                 @updatedAt
+  user             User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  serviceCoverages ProviderIslandCoverage[]
 
   @@index([status, visibility])
 }
@@ -101,4 +117,72 @@ model CustomerProfile {
   user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([status])
+}
+
+/// Service taxonomy. Parent-child hierarchy; unlimited depth.
+model Category {
+  id           String        @id @default(cuid())
+  name         String
+  slug         String        @unique
+  description  String?
+  icon         String?
+  parentId     String?
+  displayOrder Int           @default(0)
+  status       CatalogStatus @default(ACTIVE)
+  metadata     Json          @default("{}")
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  parent       Category?     @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: Restrict)
+  children     Category[]    @relation("CategoryHierarchy")
+
+  @@index([parentId])
+  @@index([status, displayOrder])
+}
+
+/// Maldives administrative atoll (or city-atoll equivalent). Country is fixed as Maldives.
+model Atoll {
+  id           String        @id @default(cuid())
+  name         String
+  code         String        @unique
+  description  String?
+  displayOrder Int           @default(0)
+  status       CatalogStatus @default(ACTIVE)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  islands      Island[]
+
+  @@index([status, displayOrder])
+}
+
+/// Island within a Maldives atoll.
+model Island {
+  id           String                   @id @default(cuid())
+  atollId      String
+  name         String
+  slug         String                   @unique
+  type         IslandType               @default(INHABITED)
+  displayOrder Int                      @default(0)
+  status       CatalogStatus            @default(ACTIVE)
+  createdAt    DateTime                 @default(now())
+  updatedAt    DateTime                 @updatedAt
+  atoll        Atoll                    @relation(fields: [atollId], references: [id], onDelete: Restrict)
+  coverages    ProviderIslandCoverage[]
+
+  @@unique([atollId, name])
+  @@index([atollId])
+  @@index([status, displayOrder])
+}
+
+/// Provider service coverage normalized to individual islands.
+model ProviderIslandCoverage {
+  id                String          @id @default(cuid())
+  providerProfileId String
+  islandId          String
+  createdAt         DateTime        @default(now())
+  providerProfile   ProviderProfile @relation(fields: [providerProfileId], references: [id], onDelete: Cascade)
+  island            Island          @relation(fields: [islandId], references: [id], onDelete: Restrict)
+
+  @@unique([providerProfileId, islandId])
+  @@index([providerProfileId])
+  @@index([islandId])
 }

@@ -22,7 +22,9 @@ flutter run --dart-define=API_BASE_URL=http://10.0.2.2:3000/api/v1
 | UI | Widget-local / Riverpod UI providers |
 | Session | `sessionProvider` — auth identity + tokens only |
 | Provider profile | `providerProfileProvider` — marketplace provider identity |
+| Provider coverage | `providerCoverageProvider` — islands served |
 | Customer profile | `customerProfileProvider` — marketplace customer identity |
+| Geography catalog | `atollsProvider` / `islandsProvider` — Maldives atolls & islands |
 | Remote | `ApiClient` + feature APIs |
 | Persistent prefs | `PreferencesStore` via `shared_preferences` |
 | Secure tokens | `TokenStore` via `flutter_secure_storage` |
@@ -43,6 +45,7 @@ flutter run --dart-define=API_BASE_URL=http://10.0.2.2:3000/api/v1
 | `/provider-profile` | View own provider profile |
 | `/provider-profile/create` | Create provider profile |
 | `/provider-profile/edit` | Edit provider profile |
+| `/provider-profile/coverage` | Edit service areas (islands) |
 
 Unauthenticated users are redirected to `/login`. Tokens are never stored in SharedPreferences.
 
@@ -56,10 +59,11 @@ lib/
     auth/       Login/register + AuthApi
     home/       Authenticated home with profile links
     customers/  Customer profile data/state/presentation
-    providers/  Provider profile data/state/presentation
+    providers/  Provider profile + service coverage
+    geography/  Atolls/islands catalog for pickers
 ```
 
-Profile features are intentionally separate from `auth/`. Session state must not absorb marketplace profile fields.
+Profile features are intentionally separate from `auth/`. Session state must not absorb marketplace profile fields. Service coverage is separate from provider profile identity fields.
 
 ## Theme
 

@@ -34,6 +34,7 @@ npm install
 npm run shared:build
 npm run prisma:generate --workspace=backend
 npm run prisma:migrate:dev --workspace=backend
+npm run db:seed --workspace=backend
 npm run backend:dev
 ```
 
@@ -64,6 +65,14 @@ Provider profiles:
 - `POST /api/v1/provider-profiles/me/restore`
 - `GET /api/v1/provider-profiles/:id` (public when ACTIVE + PUBLIC)
 
+Provider coverage:
+
+- `GET /api/v1/provider-profiles/me/coverage`
+- `PUT /api/v1/provider-profiles/me/coverage`
+- `POST /api/v1/provider-profiles/me/coverage/islands`
+- `DELETE /api/v1/provider-profiles/me/coverage/islands`
+- `POST /api/v1/provider-profiles/me/coverage/atolls/:atollId`
+
 Customer profiles:
 
 - `POST /api/v1/customer-profiles`
@@ -71,6 +80,22 @@ Customer profiles:
 - `PATCH /api/v1/customer-profiles/me`
 - `POST /api/v1/customer-profiles/me/deactivate`
 - `POST /api/v1/customer-profiles/me/restore`
+
+Categories:
+
+- `GET /api/v1/categories`
+- `GET /api/v1/categories/:id`
+- `POST /api/v1/categories` (admin)
+- `PATCH /api/v1/categories/:id` (admin)
+- `DELETE /api/v1/categories/:id` (admin)
+
+Maldives geography:
+
+- `GET /api/v1/atolls`
+- `GET /api/v1/atolls/:id`
+- `GET /api/v1/atolls/:id/islands`
+- `GET /api/v1/islands`
+- `GET /api/v1/islands/:id`
 
 ### 3. Frontend
 
@@ -80,7 +105,7 @@ flutter pub get
 flutter run --dart-define=API_BASE_URL=http://localhost:3000/api/v1
 ```
 
-Auth screens: `/login`, `/register`. Profile screens: `/customer-profile*`, `/provider-profile*`. Tokens are stored with `flutter_secure_storage`.
+Auth screens: `/login`, `/register`. Profile screens: `/customer-profile*`, `/provider-profile*`, `/provider-profile/coverage`. Tokens are stored with `flutter_secure_storage`.
 
 ## Environments
 
@@ -116,11 +141,11 @@ docs/database/     Schema and migration notes
 
 ## Current phase
 
-**Phase 2 — Provider & Customer Profiles** is implemented.
+**Phase 3 — Categories & Maldives Service Areas** is implemented.
 
-In scope: independent provider/customer marketplace identities linked to User, profile CRUD, soft deactivate/restore, public provider read, Flutter profile foundations.
+In scope: hierarchical service categories, Maldives atoll/island geography, provider island coverage, development seed pipeline, provider service-area Flutter UI.
 
-Out of scope until later phases: categories, service areas, listings, search, bookings, payments, reviews, messaging, file upload storage.
+Out of scope until later phases: service listings, search, bookings, payments, reviews, messaging, notifications, multi-country geography.
 
 ## Scripts
 
@@ -131,11 +156,20 @@ Out of scope until later phases: categories, service areas, listings, search, bo
 | `npm run backend:test` | Run backend unit tests |
 | `npm run backend:lint` | Lint backend |
 | `npm run shared:build` | Build shared package |
+| `npm run db:seed --workspace=backend` | Seed development data |
+| `npm run db:reseed --workspace=backend` | Clear + seed |
+| `npm run db:reset --workspace=backend` | Migrate reset + seed |
 
 ## Documentation
 
 - [ADR-0001 Phase 0 Foundation](docs/architecture/ADR-0001-phase-0-foundation.md)
 - [ADR-0002 Phase 1 Identity](docs/architecture/ADR-0002-phase-1-identity.md)
 - [ADR-0003 Phase 2 Profiles](docs/architecture/ADR-0003-phase-2-profiles.md)
+- [ADR-0004 Phase 3 Categories & Geography](docs/architecture/ADR-0004-phase-3-categories-geography.md)
 - [Domain — Profiles](docs/domain/profiles.md)
+- [Domain — Categories](docs/domain/categories.md)
+- [Domain — Maldives Geography](docs/domain/maldives-geography.md)
+- [Domain — Service Coverage](docs/domain/service-coverage.md)
 - [Database — Phase 2 Profiles](docs/database/phase-2-profiles.md)
+- [Database — Phase 3](docs/database/phase-3-categories-geography.md)
+- [Seed Data](docs/database/seed-data.md)

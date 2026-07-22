@@ -21,7 +21,14 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate:dev": "prisma migrate dev",
     "prisma:migrate:deploy": "prisma migrate deploy",
-    "prisma:studio": "prisma studio"
+    "prisma:studio": "prisma studio",
+    "db:seed": "prisma db seed",
+    "db:clear": "ts-node --transpile-only prisma/clear-dev-data.ts",
+    "db:reset": "prisma migrate reset --force",
+    "db:reseed": "npm run db:clear && npm run db:seed"
+  },
+  "prisma": {
+    "seed": "ts-node --transpile-only prisma/seed.ts"
   },
   "dependencies": {
     "@local-service-marketplace/shared": "*",

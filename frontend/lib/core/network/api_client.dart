@@ -111,6 +111,46 @@ class ApiClient {
     }
   }
 
+  Future<ApiEnvelope<T>> put<T>(
+    String path, {
+    Object? data,
+    T? Function(Object? raw)? parseData,
+    bool skipAuth = false,
+  }) async {
+    try {
+      final response = await _dio.put<Map<String, dynamic>>(
+        path,
+        data: data,
+        options: Options(extra: {'skipAuth': skipAuth}),
+      );
+      return _parseEnvelope(response.data, parseData: parseData);
+    } on DioException catch (error) {
+      throw _mapDioException(error);
+    } catch (_) {
+      throw const UnexpectedAppException();
+    }
+  }
+
+  Future<ApiEnvelope<T>> delete<T>(
+    String path, {
+    Object? data,
+    T? Function(Object? raw)? parseData,
+    bool skipAuth = false,
+  }) async {
+    try {
+      final response = await _dio.delete<Map<String, dynamic>>(
+        path,
+        data: data,
+        options: Options(extra: {'skipAuth': skipAuth}),
+      );
+      return _parseEnvelope(response.data, parseData: parseData);
+    } on DioException catch (error) {
+      throw _mapDioException(error);
+    } catch (_) {
+      throw const UnexpectedAppException();
+    }
+  }
+
   ApiEnvelope<T> _parseEnvelope<T>(
     Map<String, dynamic>? data, {
     T? Function(Object? raw)? parseData,

@@ -24,7 +24,9 @@ Marketplace **business identity** for a service provider:
 - Lifecycle status (`ACTIVE` | `DEACTIVATED`)
 - Computed completion status
 
-Provider Profile is **not** a service listing. It does not include services, pricing, availability, service areas, reviews, ratings, verification, or reputation.
+Provider Profile is **not** a service listing. It does not include services, pricing, availability, reviews, ratings, verification, or reputation.
+
+Service areas (which islands a provider serves) are modeled separately as **Provider Island Coverage** — see [service-coverage.md](./service-coverage.md) and ADR-0004.
 
 ### Customer Profile
 

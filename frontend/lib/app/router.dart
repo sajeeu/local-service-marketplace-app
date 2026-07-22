@@ -12,6 +12,7 @@ import 'package:frontend/features/customers/presentation/edit_customer_profile_s
 import 'package:frontend/features/customers/presentation/view_customer_profile_screen.dart';
 import 'package:frontend/features/home/presentation/home_screen.dart';
 import 'package:frontend/features/providers/presentation/create_provider_profile_screen.dart';
+import 'package:frontend/features/providers/presentation/edit_provider_coverage_screen.dart';
 import 'package:frontend/features/providers/presentation/edit_provider_profile_screen.dart';
 import 'package:frontend/features/providers/presentation/view_provider_profile_screen.dart';
 import 'package:go_router/go_router.dart';
@@ -26,6 +27,7 @@ abstract final class AppRoutes {
   static const providerProfile = '/provider-profile';
   static const providerProfileCreate = '/provider-profile/create';
   static const providerProfileEdit = '/provider-profile/edit';
+  static const providerProfileCoverage = '/provider-profile/coverage';
   static const customerProfile = '/customer-profile';
   static const customerProfileCreate = '/customer-profile/create';
   static const customerProfileEdit = '/customer-profile/edit';
@@ -133,6 +135,13 @@ final routerProvider = Provider<GoRouter>((ref) {
         name: 'provider-profile-edit',
         builder: (BuildContext context, GoRouterState state) {
           return const EditProviderProfileScreen();
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.providerProfileCoverage,
+        name: 'provider-profile-coverage',
+        builder: (BuildContext context, GoRouterState state) {
+          return const EditProviderCoverageScreen();
         },
       ),
       GoRoute(

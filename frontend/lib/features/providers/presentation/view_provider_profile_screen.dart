@@ -10,6 +10,7 @@ import 'package:frontend/core/widgets/empty_state.dart';
 import 'package:frontend/core/widgets/profile_avatar_placeholder.dart';
 import 'package:frontend/core/widgets/profile_field_row.dart';
 import 'package:frontend/core/widgets/status_chip.dart';
+import 'package:frontend/features/providers/state/provider_coverage_provider.dart';
 import 'package:frontend/features/providers/state/provider_profile_provider.dart';
 import 'package:go_router/go_router.dart';
 
@@ -143,9 +144,16 @@ class ViewProviderProfileScreen extends ConsumerWidget {
                   icon: Icons.translate_outlined,
                 ),
               const SizedBox(height: AppSpacing.md),
+              const _CoverageSummarySection(),
+              const SizedBox(height: AppSpacing.md),
               FilledButton(
                 onPressed: () => context.go(AppRoutes.providerProfileEdit),
                 child: const Text('Edit profile'),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              OutlinedButton(
+                onPressed: () => context.go(AppRoutes.providerProfileCoverage),
+                child: const Text('Edit service areas'),
               ),
               const SizedBox(height: AppSpacing.sm),
               if (profile.isActive)
@@ -162,6 +170,56 @@ class ViewProviderProfileScreen extends ConsumerWidget {
           );
         },
       ),
+    );
+  }
+}
+
+class _CoverageSummarySection extends ConsumerWidget {
+  const _CoverageSummarySection();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final coverageAsync = ref.watch(providerCoverageProvider);
+    final theme = Theme.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text('Service areas', style: theme.textTheme.titleMedium),
+        const SizedBox(height: AppSpacing.sm),
+        coverageAsync.when(
+          loading: () => const LinearProgressIndicator(),
+          error: (error, _) => Text(
+            ErrorFeedback.messageOf(error),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.error,
+            ),
+          ),
+          data: (coverage) {
+            if (coverage == null || coverage.islands.isEmpty) {
+              return Text(
+                'No service areas selected yet.',
+                style: theme.textTheme.bodyMedium,
+              );
+            }
+            return Wrap(
+              spacing: AppSpacing.sm,
+              runSpacing: AppSpacing.sm,
+              children: coverage.islands
+                  .map(
+                    (island) => Chip(
+                      label: Text(
+                        island.atollCode != null
+                            ? '${island.name} (${island.atollCode})'
+                            : island.name,
+                      ),
+                    ),
+                  )
+                  .toList(),
+            );
+          },
+        ),
+      ],
     );
   }
 }
