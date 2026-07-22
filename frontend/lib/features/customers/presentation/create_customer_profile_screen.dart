@@ -4,7 +4,9 @@ import 'package:frontend/app/router.dart';
 import 'package:frontend/core/errors/error_feedback.dart';
 import 'package:frontend/core/theme/app_tokens.dart';
 import 'package:frontend/core/widgets/app_scaffold.dart';
+import 'package:frontend/core/widgets/primary_async_button.dart';
 import 'package:frontend/core/widgets/profile_avatar_placeholder.dart';
+import 'package:frontend/core/widgets/section_header.dart';
 import 'package:frontend/features/customers/data/customer_profile_models.dart';
 import 'package:frontend/features/customers/state/customer_profile_provider.dart';
 import 'package:go_router/go_router.dart';
@@ -74,32 +76,35 @@ class _CreateCustomerProfileScreenState
   Widget build(BuildContext context) {
     return AppScaffold(
       title: 'Create customer profile',
+      maxContentWidth: AppLayout.formMaxWidth,
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
-                'Customer identity',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              Text(
-                'Separate from your login account and from provider profiles.',
-                style: Theme.of(context).textTheme.bodyLarge,
+              const SectionHeader(
+                title: 'Customer identity',
+                subtitle:
+                    'Separate from your login account and from provider profiles.',
               ),
               const SizedBox(height: AppSpacing.lg),
               Center(
-                child: ProfileAvatarPlaceholder(
-                  displayName: _displayNameController.text,
+                child: ValueListenableBuilder<TextEditingValue>(
+                  valueListenable: _displayNameController,
+                  builder: (context, value, _) {
+                    return ProfileAvatarPlaceholder(
+                      displayName: value.text,
+                    );
+                  },
                 ),
               ),
               const SizedBox(height: AppSpacing.lg),
               TextFormField(
                 controller: _displayNameController,
+                enabled: !_submitting,
+                textInputAction: TextInputAction.next,
                 decoration: const InputDecoration(labelText: 'Display name'),
-                onChanged: (_) => setState(() {}),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
                     return 'Display name is required';
@@ -110,19 +115,25 @@ class _CreateCustomerProfileScreenState
               const SizedBox(height: AppSpacing.md),
               TextFormField(
                 controller: _contactEmailController,
+                enabled: !_submitting,
                 keyboardType: TextInputType.emailAddress,
+                textInputAction: TextInputAction.next,
                 decoration: const InputDecoration(labelText: 'Contact email'),
               ),
               const SizedBox(height: AppSpacing.md),
               TextFormField(
                 controller: _contactPhoneController,
+                enabled: !_submitting,
                 keyboardType: TextInputType.phone,
+                textInputAction: TextInputAction.done,
                 decoration: const InputDecoration(labelText: 'Contact phone'),
               ),
               const SizedBox(height: AppSpacing.lg),
-              FilledButton(
-                onPressed: _submitting ? null : _submit,
-                child: Text(_submitting ? 'Creating…' : 'Create profile'),
+              PrimaryAsyncButton(
+                label: 'Create profile',
+                busyLabel: 'Creating…',
+                isBusy: _submitting,
+                onPressed: _submit,
               ),
             ],
           ),

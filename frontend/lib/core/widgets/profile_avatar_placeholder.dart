@@ -15,20 +15,26 @@ class ProfileAvatarPlaceholder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final initial = _initial(displayName);
-    return CircleAvatar(
-      radius: size / 2,
-      backgroundColor: AppColors.primary.withValues(alpha: 0.12),
-      foregroundColor: AppColors.primary,
-      child: initial == null
-          ? Icon(Icons.person_outline, size: size * 0.5)
-          : Text(
-              initial,
-              style: TextStyle(
-                fontSize: size * 0.36,
-                fontWeight: FontWeight.w600,
-                color: AppColors.primary,
+    return Semantics(
+      label: displayName == null || displayName!.trim().isEmpty
+          ? 'Profile avatar placeholder'
+          : 'Profile avatar for $displayName',
+      image: true,
+      child: CircleAvatar(
+        radius: size / 2,
+        backgroundColor: AppColors.primaryContainer,
+        foregroundColor: AppColors.primary,
+        child: initial == null
+            ? Icon(Icons.person_outline, size: size * 0.5)
+            : Text(
+                initial,
+                style: TextStyle(
+                  fontSize: size * 0.36,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.primary,
+                ),
               ),
-            ),
+      ),
     );
   }
 

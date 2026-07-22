@@ -4,16 +4,47 @@ import 'package:frontend/app/router.dart';
 import 'package:frontend/core/errors/error_feedback.dart';
 import 'package:frontend/core/theme/app_tokens.dart';
 import 'package:frontend/core/widgets/app_scaffold.dart';
+import 'package:frontend/core/widgets/async_body.dart';
+import 'package:frontend/core/widgets/confirm_dialog.dart';
+import 'package:frontend/core/widgets/empty_state.dart';
 import 'package:frontend/core/widgets/profile_avatar_placeholder.dart';
+import 'package:frontend/core/widgets/profile_field_row.dart';
+import 'package:frontend/core/widgets/status_chip.dart';
 import 'package:frontend/features/customers/state/customer_profile_provider.dart';
 import 'package:go_router/go_router.dart';
 
 class ViewCustomerProfileScreen extends ConsumerWidget {
   const ViewCustomerProfileScreen({super.key});
 
+  Future<void> _deactivate(BuildContext context, WidgetRef ref) async {
+    final confirmed = await confirmDestructiveAction(
+      context,
+      title: 'Deactivate customer profile?',
+      message:
+          'Your customer profile will be deactivated. You can restore it later.',
+    );
+    if (!confirmed) {
+      return;
+    }
+    await ref.read(customerProfileProvider.notifier).deactivate();
+    final state = ref.read(customerProfileProvider);
+    if (state.hasError && context.mounted) {
+      ErrorFeedback.showSnackBar(context, state.error!);
+    }
+  }
+
+  Future<void> _restore(BuildContext context, WidgetRef ref) async {
+    await ref.read(customerProfileProvider.notifier).restore();
+    final state = ref.read(customerProfileProvider);
+    if (state.hasError && context.mounted) {
+      ErrorFeedback.showSnackBar(context, state.error!);
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncProfile = ref.watch(customerProfileProvider);
+    final theme = Theme.of(context);
 
     return AppScaffold(
       title: 'Customer profile',
@@ -24,40 +55,20 @@ class ViewCustomerProfileScreen extends ConsumerWidget {
           icon: const Icon(Icons.home_outlined),
         ),
       ],
-      body: asyncProfile.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(error.toString()),
-              const SizedBox(height: AppSpacing.md),
-              FilledButton(
-                onPressed: () =>
-                    ref.read(customerProfileProvider.notifier).refresh(),
-                child: const Text('Retry'),
-              ),
-            ],
-          ),
-        ),
-        data: (profile) {
+      body: AsyncBody(
+        isLoading: asyncProfile.isLoading,
+        error: asyncProfile.hasError ? asyncProfile.error : null,
+        onRetry: () => ref.read(customerProfileProvider.notifier).refresh(),
+        builder: () {
+          final profile = asyncProfile.value;
           if (profile == null) {
-            return Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'No customer profile yet',
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  FilledButton(
-                    onPressed: () =>
-                        context.go(AppRoutes.customerProfileCreate),
-                    child: const Text('Create customer profile'),
-                  ),
-                ],
-              ),
+            return EmptyState(
+              icon: Icons.person_add_alt_1_outlined,
+              title: 'No customer profile yet',
+              message:
+                  'Create a customer profile to book local services with a trusted identity.',
+              actionLabel: 'Create customer profile',
+              onAction: () => context.go(AppRoutes.customerProfileCreate),
             );
           }
 
@@ -72,20 +83,35 @@ class ViewCustomerProfileScreen extends ConsumerWidget {
               Text(
                 profile.displayName,
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.headlineSmall,
+                style: theme.textTheme.headlineSmall,
               ),
-              const SizedBox(height: AppSpacing.sm),
-              Text('Status: ${profile.status}'),
-              Text(
-                'Completion: ${profile.completion.status} (${profile.completion.percent}%)',
+              const SizedBox(height: AppSpacing.md),
+              Wrap(
+                alignment: WrapAlignment.center,
+                spacing: AppSpacing.sm,
+                runSpacing: AppSpacing.sm,
+                children: [
+                  StatusChip.profileStatus(profile.status),
+                  StatusChip.completion(
+                    status: profile.completion.status,
+                    percent: profile.completion.percent,
+                  ),
+                ],
               ),
-              if (profile.contactEmail != null) ...[
-                const SizedBox(height: AppSpacing.md),
-                Text('Email: ${profile.contactEmail}'),
-              ],
+              const SizedBox(height: AppSpacing.xl),
+              if (profile.contactEmail != null)
+                ProfileFieldRow(
+                  label: 'Contact email',
+                  value: profile.contactEmail!,
+                  icon: Icons.email_outlined,
+                ),
               if (profile.contactPhone != null)
-                Text('Phone: ${profile.contactPhone}'),
-              const SizedBox(height: AppSpacing.lg),
+                ProfileFieldRow(
+                  label: 'Contact phone',
+                  value: profile.contactPhone!,
+                  icon: Icons.phone_outlined,
+                ),
+              const SizedBox(height: AppSpacing.md),
               FilledButton(
                 onPressed: () => context.go(AppRoutes.customerProfileEdit),
                 child: const Text('Edit profile'),
@@ -93,26 +119,12 @@ class ViewCustomerProfileScreen extends ConsumerWidget {
               const SizedBox(height: AppSpacing.sm),
               if (profile.isActive)
                 OutlinedButton(
-                  onPressed: () async {
-                    await ref
-                        .read(customerProfileProvider.notifier)
-                        .deactivate();
-                    final state = ref.read(customerProfileProvider);
-                    if (state.hasError && context.mounted) {
-                      ErrorFeedback.showSnackBar(context, state.error!);
-                    }
-                  },
+                  onPressed: () => _deactivate(context, ref),
                   child: const Text('Deactivate'),
                 )
               else
                 OutlinedButton(
-                  onPressed: () async {
-                    await ref.read(customerProfileProvider.notifier).restore();
-                    final state = ref.read(customerProfileProvider);
-                    if (state.hasError && context.mounted) {
-                      ErrorFeedback.showSnackBar(context, state.error!);
-                    }
-                  },
+                  onPressed: () => _restore(context, ref),
                   child: const Text('Restore'),
                 ),
             ],

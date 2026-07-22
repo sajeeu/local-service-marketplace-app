@@ -7,6 +7,9 @@ import 'package:frontend/core/network/api_client.dart';
 import 'package:frontend/core/state/session_provider.dart';
 import 'package:frontend/core/theme/app_tokens.dart';
 import 'package:frontend/core/widgets/app_scaffold.dart';
+import 'package:frontend/core/widgets/profile_role_card.dart';
+import 'package:frontend/core/widgets/section_header.dart';
+import 'package:frontend/core/widgets/status_chip.dart';
 import 'package:frontend/features/customers/state/customer_profile_provider.dart';
 import 'package:frontend/features/providers/state/provider_profile_provider.dart';
 import 'package:go_router/go_router.dart';
@@ -21,10 +24,10 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   String? _healthStatus;
-  bool _loading = false;
+  bool _loadingHealth = false;
 
   Future<void> _checkHealth() async {
-    setState(() => _loading = true);
+    setState(() => _loadingHealth = true);
     try {
       final client = ref.read(apiClientProvider);
       final envelope = await client.get<Map<String, dynamic>>(
@@ -42,7 +45,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       }
     } finally {
       if (mounted) {
-        setState(() => _loading = false);
+        setState(() => _loadingHealth = false);
       }
     }
   }
@@ -53,6 +56,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final email = session?.user?.email;
     final providerProfile = ref.watch(providerProfileProvider);
     final customerProfile = ref.watch(customerProfileProvider);
+    final theme = Theme.of(context);
 
     return AppScaffold(
       title: AppConfig.current.appName,
@@ -65,76 +69,93 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ],
       body: ListView(
         children: [
-          Text(
-            'Marketplace profiles',
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          Text(
-            email == null ? 'Signed in.' : 'Signed in as $email',
-            style: Theme.of(context).textTheme.bodyLarge,
+          SectionHeader(
+            title: email == null ? 'Welcome' : 'Welcome back',
+            subtitle: email == null
+                ? 'Manage your marketplace profiles.'
+                : 'Signed in as $email',
           ),
           const SizedBox(height: AppSpacing.lg),
-          Text(
-            'Customer profile',
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          customerProfile.when(
-            loading: () => const LinearProgressIndicator(),
-            error: (_, __) => TextButton(
-              onPressed: () =>
-                  ref.read(customerProfileProvider.notifier).refresh(),
-              child: const Text('Retry customer profile'),
+          ProfileRoleCard(
+            title: 'Customer profile',
+            description:
+                'Book local services and manage your customer identity.',
+            icon: Icons.person_outline,
+            isLoading: customerProfile.isLoading,
+            hasError: customerProfile.hasError,
+            onRetry: () =>
+                ref.read(customerProfileProvider.notifier).refresh(),
+            statusChip: customerProfile.whenOrNull(
+              data: (profile) => profile == null
+                  ? StatusChip.missing()
+                  : StatusChip.profileStatus(profile.status),
             ),
-            data: (profile) => FilledButton(
-              onPressed: () => context.go(
+            actionLabel: customerProfile.asData?.value == null
+                ? 'Create customer profile'
+                : 'View customer profile',
+            onAction: () {
+              final profile = customerProfile.asData?.value;
+              context.go(
                 profile == null
                     ? AppRoutes.customerProfileCreate
                     : AppRoutes.customerProfile,
-              ),
-              child: Text(
-                profile == null
-                    ? 'Create customer profile'
-                    : 'View customer profile',
-              ),
-            ),
+              );
+            },
           ),
-          const SizedBox(height: AppSpacing.lg),
-          Text(
-            'Provider profile',
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          providerProfile.when(
-            loading: () => const LinearProgressIndicator(),
-            error: (_, __) => TextButton(
-              onPressed: () =>
-                  ref.read(providerProfileProvider.notifier).refresh(),
-              child: const Text('Retry provider profile'),
+          const SizedBox(height: AppSpacing.md),
+          ProfileRoleCard(
+            title: 'Provider profile',
+            description:
+                'Offer services and manage your business marketplace identity.',
+            icon: Icons.storefront_outlined,
+            isLoading: providerProfile.isLoading,
+            hasError: providerProfile.hasError,
+            onRetry: () =>
+                ref.read(providerProfileProvider.notifier).refresh(),
+            statusChip: providerProfile.whenOrNull(
+              data: (profile) => profile == null
+                  ? StatusChip.missing()
+                  : StatusChip.profileStatus(profile.status),
             ),
-            data: (profile) => FilledButton(
-              onPressed: () => context.go(
+            actionLabel: providerProfile.asData?.value == null
+                ? 'Create provider profile'
+                : 'View provider profile',
+            onAction: () {
+              final profile = providerProfile.asData?.value;
+              context.go(
                 profile == null
                     ? AppRoutes.providerProfileCreate
                     : AppRoutes.providerProfile,
-              ),
-              child: Text(
-                profile == null
-                    ? 'Create provider profile'
-                    : 'View provider profile',
+              );
+            },
+          ),
+          const SizedBox(height: AppSpacing.xl),
+          Divider(color: AppColors.outline.withValues(alpha: 0.6)),
+          const SizedBox(height: AppSpacing.sm),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton.icon(
+              onPressed: _loadingHealth ? null : _checkHealth,
+              icon: _loadingHealth
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.monitor_heart_outlined, size: 18),
+              label: Text(
+                _loadingHealth ? 'Checking…' : 'Check API health',
               ),
             ),
           ),
-          const SizedBox(height: AppSpacing.xl),
-          OutlinedButton(
-            onPressed: _loading ? null : _checkHealth,
-            child: Text(_loading ? 'Checking…' : 'Check API health'),
-          ),
-          if (_healthStatus != null) ...[
-            const SizedBox(height: AppSpacing.md),
-            Text('API health: $_healthStatus'),
-          ],
+          if (_healthStatus != null)
+            Padding(
+              padding: const EdgeInsets.only(left: AppSpacing.sm),
+              child: Text(
+                'API health: $_healthStatus',
+                style: theme.textTheme.bodyMedium,
+              ),
+            ),
         ],
       ),
     );

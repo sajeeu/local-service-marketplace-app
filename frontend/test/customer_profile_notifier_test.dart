@@ -6,7 +6,7 @@ import 'package:frontend/features/customers/data/customer_profile_models.dart';
 import 'package:frontend/features/customers/state/customer_profile_provider.dart';
 
 class _FakeCustomerProfileApi implements CustomerProfileApi {
-  _FakeCustomerProfileApi({this.profile});
+  _FakeCustomerProfileApi();
 
   CustomerProfile? profile;
 
@@ -82,15 +82,15 @@ void main() {
   test('creates customer profile and handles missing', () async {
     final api = _FakeCustomerProfileApi();
     final container = ProviderContainer(
-      overrides: [
-        customerProfileApiProvider.overrideWithValue(api),
-      ],
+      overrides: [customerProfileApiProvider.overrideWithValue(api)],
     );
     addTearDown(container.dispose);
 
     expect(await container.read(customerProfileProvider.future), isNull);
 
-    await container.read(customerProfileProvider.notifier).create(
+    await container
+        .read(customerProfileProvider.notifier)
+        .create(
           const CreateCustomerProfileInput(
             displayName: 'Jordan',
             contactEmail: 'jordan@example.com',

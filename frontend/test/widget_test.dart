@@ -184,7 +184,7 @@ void main() {
 
     await tester.pumpAndSettle();
 
-    expect(find.text('Marketplace profiles'), findsOneWidget);
+    expect(find.text('Welcome back'), findsOneWidget);
     expect(find.textContaining('user@example.com'), findsOneWidget);
     expect(find.text('Create customer profile'), findsOneWidget);
     expect(find.text('Create provider profile'), findsOneWidget);

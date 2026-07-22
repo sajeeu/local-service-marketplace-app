@@ -9,6 +9,12 @@ flutter pub get
 flutter run --dart-define=API_BASE_URL=http://localhost:3000/api/v1
 ```
 
+On an **Android emulator**, `localhost` is automatically rewritten to `10.0.2.2` so the app can reach the backend on your host machine. You can also set it explicitly:
+
+```bash
+flutter run --dart-define=API_BASE_URL=http://10.0.2.2:3000/api/v1
+```
+
 ## State ownership
 
 | Kind | Approach |
@@ -51,3 +57,9 @@ lib/
 ```
 
 Profile features are intentionally separate from `auth/`. Session state must not absorb marketplace profile fields.
+
+## Theme
+
+Visual design tokens live in `lib/core/theme/app_tokens.dart` and are applied via `lib/core/theme/app_theme.dart`.
+
+The brand uses a professional blue palette (`#1565C0` primary) to communicate trust and reliability for a local service marketplace. Shared UI building blocks (scaffold width constraints, status chips, async/empty states, password field) live under `lib/core/widgets/`.

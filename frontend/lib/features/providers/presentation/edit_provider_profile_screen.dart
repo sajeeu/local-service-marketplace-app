@@ -4,6 +4,11 @@ import 'package:frontend/app/router.dart';
 import 'package:frontend/core/errors/error_feedback.dart';
 import 'package:frontend/core/theme/app_tokens.dart';
 import 'package:frontend/core/widgets/app_scaffold.dart';
+import 'package:frontend/core/widgets/async_body.dart';
+import 'package:frontend/core/widgets/empty_state.dart';
+import 'package:frontend/core/widgets/primary_async_button.dart';
+import 'package:frontend/core/widgets/profile_avatar_placeholder.dart';
+import 'package:frontend/core/widgets/section_header.dart';
 import 'package:frontend/features/providers/data/provider_profile_models.dart';
 import 'package:frontend/features/providers/state/provider_profile_provider.dart';
 import 'package:go_router/go_router.dart';
@@ -117,101 +122,150 @@ class _EditProviderProfileScreenState
 
     return AppScaffold(
       title: 'Edit provider profile',
-      body: asyncProfile.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => Center(
-          child: TextButton(
-            onPressed: () =>
-                ref.read(providerProfileProvider.notifier).refresh(),
-            child: const Text('Retry'),
-          ),
-        ),
-        data: (profile) {
+      maxContentWidth: AppLayout.formMaxWidth,
+      body: AsyncBody(
+        isLoading: asyncProfile.isLoading && !_initialized,
+        error: asyncProfile.hasError && !_initialized
+            ? asyncProfile.error
+            : null,
+        onRetry: () => ref.read(providerProfileProvider.notifier).refresh(),
+        builder: () {
+          final profile = asyncProfile.value;
           if (profile == null) {
-            return Center(
-              child: FilledButton(
-                onPressed: () => context.go(AppRoutes.providerProfileCreate),
-                child: const Text('Create provider profile'),
-              ),
+            return EmptyState(
+              icon: Icons.storefront_outlined,
+              title: 'No provider profile yet',
+              message: 'Create a provider profile before editing.',
+              actionLabel: 'Create provider profile',
+              onAction: () => context.go(AppRoutes.providerProfileCreate),
             );
           }
           _ensureControllers(profile);
           return Form(
             key: _formKey,
-            child: ListView(
-              children: [
-                TextFormField(
-                  controller: _displayNameController,
-                  decoration: const InputDecoration(labelText: 'Display name'),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Display name is required';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: AppSpacing.md),
-                TextFormField(
-                  controller: _businessNameController,
-                  decoration:
-                      const InputDecoration(labelText: 'Business name'),
-                ),
-                const SizedBox(height: AppSpacing.md),
-                TextFormField(
-                  controller: _descriptionController,
-                  maxLines: 3,
-                  decoration: const InputDecoration(labelText: 'Description'),
-                ),
-                const SizedBox(height: AppSpacing.md),
-                TextFormField(
-                  controller: _contactEmailController,
-                  decoration:
-                      const InputDecoration(labelText: 'Contact email'),
-                ),
-                const SizedBox(height: AppSpacing.md),
-                TextFormField(
-                  controller: _contactPhoneController,
-                  decoration:
-                      const InputDecoration(labelText: 'Contact phone'),
-                ),
-                const SizedBox(height: AppSpacing.md),
-                TextFormField(
-                  controller: _websiteUrlController,
-                  decoration: const InputDecoration(labelText: 'Website URL'),
-                ),
-                const SizedBox(height: AppSpacing.md),
-                TextFormField(
-                  controller: _logoUrlController,
-                  decoration: const InputDecoration(labelText: 'Logo URL'),
-                ),
-                const SizedBox(height: AppSpacing.md),
-                TextFormField(
-                  controller: _languagesController,
-                  decoration: const InputDecoration(
-                    labelText: 'Languages (comma-separated)',
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const SectionHeader(
+                    title: 'Business identity',
+                    subtitle:
+                        'Update how your business appears on the marketplace.',
                   ),
-                ),
-                const SizedBox(height: AppSpacing.md),
-                SwitchListTile(
-                  contentPadding: EdgeInsets.zero,
-                  title: const Text('Public profile'),
-                  subtitle:
-                      const Text('Allow others to view this provider profile'),
-                  value: _visibility == 'PUBLIC',
-                  onChanged: _submitting
-                      ? null
-                      : (value) {
-                          setState(
-                            () => _visibility = value ? 'PUBLIC' : 'PRIVATE',
-                          );
-                        },
-                ),
-                const SizedBox(height: AppSpacing.lg),
-                FilledButton(
-                  onPressed: _submitting ? null : _submit,
-                  child: Text(_submitting ? 'Saving…' : 'Save changes'),
-                ),
-              ],
+                  const SizedBox(height: AppSpacing.lg),
+                  Center(
+                    child: ValueListenableBuilder<TextEditingValue>(
+                      valueListenable: _displayNameController,
+                      builder: (context, value, _) {
+                        return ProfileAvatarPlaceholder(
+                          displayName: value.text,
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  TextFormField(
+                    controller: _displayNameController,
+                    enabled: !_submitting,
+                    textInputAction: TextInputAction.next,
+                    decoration:
+                        const InputDecoration(labelText: 'Display name'),
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'Display name is required';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  TextFormField(
+                    controller: _businessNameController,
+                    enabled: !_submitting,
+                    textInputAction: TextInputAction.next,
+                    decoration:
+                        const InputDecoration(labelText: 'Business name'),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  TextFormField(
+                    controller: _descriptionController,
+                    enabled: !_submitting,
+                    maxLines: 3,
+                    decoration:
+                        const InputDecoration(labelText: 'Description'),
+                  ),
+                  const SizedBox(height: AppSpacing.xl),
+                  const SectionHeader(title: 'Contact'),
+                  const SizedBox(height: AppSpacing.md),
+                  TextFormField(
+                    controller: _contactEmailController,
+                    enabled: !_submitting,
+                    keyboardType: TextInputType.emailAddress,
+                    textInputAction: TextInputAction.next,
+                    decoration:
+                        const InputDecoration(labelText: 'Contact email'),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  TextFormField(
+                    controller: _contactPhoneController,
+                    enabled: !_submitting,
+                    keyboardType: TextInputType.phone,
+                    textInputAction: TextInputAction.next,
+                    decoration:
+                        const InputDecoration(labelText: 'Contact phone'),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  TextFormField(
+                    controller: _websiteUrlController,
+                    enabled: !_submitting,
+                    keyboardType: TextInputType.url,
+                    textInputAction: TextInputAction.next,
+                    decoration:
+                        const InputDecoration(labelText: 'Website URL'),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  TextFormField(
+                    controller: _logoUrlController,
+                    enabled: !_submitting,
+                    keyboardType: TextInputType.url,
+                    textInputAction: TextInputAction.next,
+                    decoration: const InputDecoration(labelText: 'Logo URL'),
+                  ),
+                  const SizedBox(height: AppSpacing.xl),
+                  const SectionHeader(title: 'Languages & visibility'),
+                  const SizedBox(height: AppSpacing.md),
+                  TextFormField(
+                    controller: _languagesController,
+                    enabled: !_submitting,
+                    decoration: const InputDecoration(
+                      labelText: 'Languages (comma-separated)',
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: const Text('Public profile'),
+                    subtitle: const Text(
+                      'Allow others to view this provider profile',
+                    ),
+                    value: _visibility == 'PUBLIC',
+                    onChanged: _submitting
+                        ? null
+                        : (value) {
+                            setState(
+                              () =>
+                                  _visibility = value ? 'PUBLIC' : 'PRIVATE',
+                            );
+                          },
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  PrimaryAsyncButton(
+                    label: 'Save changes',
+                    busyLabel: 'Saving…',
+                    isBusy: _submitting,
+                    onPressed: _submit,
+                  ),
+                ],
+              ),
             ),
           );
         },

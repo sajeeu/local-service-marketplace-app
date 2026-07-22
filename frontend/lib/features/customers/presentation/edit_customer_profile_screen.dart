@@ -4,7 +4,11 @@ import 'package:frontend/app/router.dart';
 import 'package:frontend/core/errors/error_feedback.dart';
 import 'package:frontend/core/theme/app_tokens.dart';
 import 'package:frontend/core/widgets/app_scaffold.dart';
+import 'package:frontend/core/widgets/async_body.dart';
+import 'package:frontend/core/widgets/empty_state.dart';
+import 'package:frontend/core/widgets/primary_async_button.dart';
 import 'package:frontend/core/widgets/profile_avatar_placeholder.dart';
+import 'package:frontend/core/widgets/section_header.dart';
 import 'package:frontend/features/customers/data/customer_profile_models.dart';
 import 'package:frontend/features/customers/state/customer_profile_provider.dart';
 import 'package:go_router/go_router.dart';
@@ -86,64 +90,87 @@ class _EditCustomerProfileScreenState
 
     return AppScaffold(
       title: 'Edit customer profile',
-      body: asyncProfile.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => Center(
-          child: TextButton(
-            onPressed: () =>
-                ref.read(customerProfileProvider.notifier).refresh(),
-            child: const Text('Retry'),
-          ),
-        ),
-        data: (profile) {
+      maxContentWidth: AppLayout.formMaxWidth,
+      body: AsyncBody(
+        isLoading: asyncProfile.isLoading && !_initialized,
+        error: asyncProfile.hasError && !_initialized
+            ? asyncProfile.error
+            : null,
+        onRetry: () => ref.read(customerProfileProvider.notifier).refresh(),
+        builder: () {
+          final profile = asyncProfile.value;
           if (profile == null) {
-            return Center(
-              child: FilledButton(
-                onPressed: () => context.go(AppRoutes.customerProfileCreate),
-                child: const Text('Create customer profile'),
-              ),
+            return EmptyState(
+              icon: Icons.person_add_alt_1_outlined,
+              title: 'No customer profile yet',
+              message: 'Create a customer profile before editing.',
+              actionLabel: 'Create customer profile',
+              onAction: () => context.go(AppRoutes.customerProfileCreate),
             );
           }
           _ensureControllers(profile);
           return Form(
             key: _formKey,
-            child: ListView(
-              children: [
-                Center(
-                  child: ProfileAvatarPlaceholder(
-                    displayName: _displayNameController.text,
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const SectionHeader(
+                    title: 'Update your details',
+                    subtitle: 'Keep your customer contact information current.',
                   ),
-                ),
-                const SizedBox(height: AppSpacing.lg),
-                TextFormField(
-                  controller: _displayNameController,
-                  decoration: const InputDecoration(labelText: 'Display name'),
-                  onChanged: (_) => setState(() {}),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Display name is required';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: AppSpacing.md),
-                TextFormField(
-                  controller: _contactEmailController,
-                  decoration:
-                      const InputDecoration(labelText: 'Contact email'),
-                ),
-                const SizedBox(height: AppSpacing.md),
-                TextFormField(
-                  controller: _contactPhoneController,
-                  decoration:
-                      const InputDecoration(labelText: 'Contact phone'),
-                ),
-                const SizedBox(height: AppSpacing.lg),
-                FilledButton(
-                  onPressed: _submitting ? null : _submit,
-                  child: Text(_submitting ? 'Saving…' : 'Save changes'),
-                ),
-              ],
+                  const SizedBox(height: AppSpacing.lg),
+                  Center(
+                    child: ValueListenableBuilder<TextEditingValue>(
+                      valueListenable: _displayNameController,
+                      builder: (context, value, _) {
+                        return ProfileAvatarPlaceholder(
+                          displayName: value.text,
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  TextFormField(
+                    controller: _displayNameController,
+                    enabled: !_submitting,
+                    textInputAction: TextInputAction.next,
+                    decoration:
+                        const InputDecoration(labelText: 'Display name'),
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'Display name is required';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  TextFormField(
+                    controller: _contactEmailController,
+                    enabled: !_submitting,
+                    keyboardType: TextInputType.emailAddress,
+                    textInputAction: TextInputAction.next,
+                    decoration:
+                        const InputDecoration(labelText: 'Contact email'),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  TextFormField(
+                    controller: _contactPhoneController,
+                    enabled: !_submitting,
+                    keyboardType: TextInputType.phone,
+                    textInputAction: TextInputAction.done,
+                    decoration:
+                        const InputDecoration(labelText: 'Contact phone'),
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  PrimaryAsyncButton(
+                    label: 'Save changes',
+                    busyLabel: 'Saving…',
+                    isBusy: _submitting,
+                    onPressed: _submit,
+                  ),
+                ],
+              ),
             ),
           );
         },

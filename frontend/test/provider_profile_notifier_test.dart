@@ -6,7 +6,7 @@ import 'package:frontend/features/providers/data/provider_profile_models.dart';
 import 'package:frontend/features/providers/state/provider_profile_provider.dart';
 
 class _FakeProviderProfileApi implements ProviderProfileApi {
-  _FakeProviderProfileApi({this.profile, this.getMeError});
+  _FakeProviderProfileApi({this.getMeError});
 
   ProviderProfile? profile;
   Object? getMeError;
@@ -119,9 +119,7 @@ void main() {
       ),
     );
     final container = ProviderContainer(
-      overrides: [
-        providerProfileApiProvider.overrideWithValue(api),
-      ],
+      overrides: [providerProfileApiProvider.overrideWithValue(api)],
     );
     addTearDown(container.dispose);
 
@@ -132,21 +130,21 @@ void main() {
   test('creates and updates provider profile', () async {
     final api = _FakeProviderProfileApi();
     final container = ProviderContainer(
-      overrides: [
-        providerProfileApiProvider.overrideWithValue(api),
-      ],
+      overrides: [providerProfileApiProvider.overrideWithValue(api)],
     );
     addTearDown(container.dispose);
 
     await container.read(providerProfileProvider.future);
-    await container.read(providerProfileProvider.notifier).create(
-          const CreateProviderProfileInput(displayName: 'Acme'),
-        );
+    await container
+        .read(providerProfileProvider.notifier)
+        .create(const CreateProviderProfileInput(displayName: 'Acme'));
 
     expect(container.read(providerProfileProvider).value?.displayName, 'Acme');
     expect(api.lastCreate?.displayName, 'Acme');
 
-    await container.read(providerProfileProvider.notifier).updateProfile(
+    await container
+        .read(providerProfileProvider.notifier)
+        .updateProfile(
           const UpdateProviderProfileInput(displayName: 'Acme Updated'),
         );
     expect(
@@ -158,16 +156,14 @@ void main() {
   test('surfaces API errors on create', () async {
     final throwingApi = _ThrowingProviderCreateApi();
     final failingContainer = ProviderContainer(
-      overrides: [
-        providerProfileApiProvider.overrideWithValue(throwingApi),
-      ],
+      overrides: [providerProfileApiProvider.overrideWithValue(throwingApi)],
     );
     addTearDown(failingContainer.dispose);
 
     await failingContainer.read(providerProfileProvider.future);
-    await failingContainer.read(providerProfileProvider.notifier).create(
-          const CreateProviderProfileInput(displayName: 'Acme'),
-        );
+    await failingContainer
+        .read(providerProfileProvider.notifier)
+        .create(const CreateProviderProfileInput(displayName: 'Acme'));
     expect(failingContainer.read(providerProfileProvider).hasError, isTrue);
   });
 }

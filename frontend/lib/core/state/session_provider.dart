@@ -60,7 +60,8 @@ class SessionNotifier extends AsyncNotifier<SessionState> {
     required String email,
     required String password,
   }) async {
-    state = const AsyncLoading();
+    // Do not set AsyncLoading — that made app.dart tear down MaterialApp.router.
+    // Screens already expose local submitting UI state.
     state = await AsyncValue.guard(() async {
       final tokens = await _authApi.login(email: email, password: password);
       return _persistAuthenticated(tokens);
@@ -72,7 +73,7 @@ class SessionNotifier extends AsyncNotifier<SessionState> {
     required String password,
     String? displayName,
   }) async {
-    state = const AsyncLoading();
+    // Do not set AsyncLoading — same MaterialApp.router teardown risk as login.
     state = await AsyncValue.guard(() async {
       final tokens = await _authApi.register(
         email: email,
