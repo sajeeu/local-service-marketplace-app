@@ -14,6 +14,8 @@ abstract final class AppColors {
   static const Color surfaceContainer = Color(0xFFFFFFFF);
   static const Color onSurface = Color(0xFF0F172A);
   static const Color onSurfaceVariant = Color(0xFF64748B);
+  /// Muted icons in text fields and secondary chrome.
+  static const Color iconMuted = Color(0xFF94A3B8);
   static const Color outline = Color(0xFFE2E8F0);
   static const Color error = Color(0xFFB42318);
   static const Color onError = Color(0xFFFFFFFF);

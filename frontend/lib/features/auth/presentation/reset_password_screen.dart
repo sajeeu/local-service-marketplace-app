@@ -19,15 +19,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   final _formKey = GlobalKey<FormState>();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  var _obscurePassword = true;
-  var _obscureConfirm = true;
   var _submitting = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _passwordController.addListener(() => setState(() {}));
-  }
 
   @override
   void dispose() {
@@ -52,6 +44,11 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final email = widget.email?.trim();
+    final subtitle = (email == null || email.isEmpty)
+        ? 'Choose a new password for your account.'
+        : 'Choose a new password for $email.';
+
     return AppScaffold(
       title: 'Reset password',
       showAppBar: false,
@@ -59,160 +56,86 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       horizontalPadding: AppSpacing.lg,
       body: Form(
         key: _formKey,
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SizedBox(height: AppSpacing.sm),
-              Row(
-                children: [
-                  IconButton(
-                    tooltip: 'Back',
-                    onPressed: _submitting
-                        ? null
-                        : () => context.go(AppRoutes.forgotPassword),
-                    icon: const Icon(Icons.arrow_back_ios_new, size: 18),
-                    visualDensity: VisualDensity.compact,
-                  ),
-                  const Expanded(child: AppBrandHeader()),
-                  const SizedBox(width: 48),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.md),
-              const Divider(height: 1, color: AppColors.outline),
-              const SizedBox(height: AppSpacing.lg),
-              AuthHeroBanner.passwordRecovery(),
-              const SizedBox(height: AppSpacing.lg),
-              const Text(
-                'Reset Password',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.w700,
-                  height: 1.2,
-                  color: AppColors.onSurface,
+        child: AutofillGroup(
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(height: AppSpacing.sm),
+                AuthBackBrandHeader(
+                  backTooltip: 'Back',
+                  onBack: _submitting
+                      ? null
+                      : () => context.go(AppRoutes.forgotPassword),
                 ),
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              Text(
-                widget.email == null || widget.email!.isEmpty
-                    ? 'Choose a new password for your account.'
-                    : 'Choose a new password for ${widget.email}.',
-                style: const TextStyle(
-                  fontSize: 15,
-                  height: 1.45,
-                  color: AppColors.onSurfaceVariant,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              const AuthFieldLabel('New Password', required: true),
-              const SizedBox(height: AppSpacing.sm),
-              TextFormField(
-                controller: _passwordController,
-                enabled: !_submitting,
-                obscureText: _obscurePassword,
-                textInputAction: TextInputAction.next,
-                autofillHints: const [AutofillHints.newPassword],
-                decoration: authInputDecoration(
+                const SizedBox(height: AppSpacing.md),
+                const Divider(height: 1, color: AppColors.outline),
+                const SizedBox(height: AppSpacing.lg),
+                AuthHeroBanner.passwordRecovery(),
+                const SizedBox(height: AppSpacing.lg),
+                const AuthPageTitle('Reset password'),
+                const SizedBox(height: AppSpacing.sm),
+                AuthPageSubtitle(subtitle),
+                const SizedBox(height: AppSpacing.lg),
+                const AuthFieldLabel('New password', required: true),
+                const SizedBox(height: AppSpacing.sm),
+                AuthPasswordField(
+                  controller: _passwordController,
+                  enabled: !_submitting,
                   hintText: 'Create a new password',
-                  prefixIcon: const Icon(
-                    Icons.lock_outline,
-                    color: Color(0xFF94A3B8),
-                    size: 22,
-                  ),
-                  suffixIcon: IconButton(
-                    tooltip: _obscurePassword
-                        ? 'Show password'
-                        : 'Hide password',
-                    onPressed: _submitting
-                        ? null
-                        : () => setState(
-                              () => _obscurePassword = !_obscurePassword,
-                            ),
-                    icon: Icon(
-                      _obscurePassword
-                          ? Icons.visibility_outlined
-                          : Icons.visibility_off_outlined,
-                      color: const Color(0xFF94A3B8),
-                    ),
-                  ),
+                  textInputAction: TextInputAction.next,
+                  autofillHints: const [AutofillHints.newPassword],
+                  validator: (value) {
+                    if (value == null || value.length < 8) {
+                      return 'Password must be at least 8 characters';
+                    }
+                    return null;
+                  },
                 ),
-                validator: (value) {
-                  if (value == null || value.length < 8) {
-                    return 'Password must be at least 8 characters';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              PasswordStrengthMeter(password: _passwordController.text),
-              const SizedBox(height: AppSpacing.md),
-              const AuthFieldLabel('Confirm Password', required: true),
-              const SizedBox(height: AppSpacing.sm),
-              TextFormField(
-                controller: _confirmPasswordController,
-                enabled: !_submitting,
-                obscureText: _obscureConfirm,
-                textInputAction: TextInputAction.done,
-                onFieldSubmitted: (_) {
-                  if (!_submitting) {
-                    _submit();
-                  }
-                },
-                decoration: authInputDecoration(
+                const SizedBox(height: AppSpacing.sm),
+                ListenableBuilder(
+                  listenable: _passwordController,
+                  builder: (context, _) {
+                    return PasswordStrengthMeter(
+                      password: _passwordController.text,
+                    );
+                  },
+                ),
+                const SizedBox(height: AppSpacing.md),
+                const AuthFieldLabel('Confirm password', required: true),
+                const SizedBox(height: AppSpacing.sm),
+                AuthPasswordField(
+                  controller: _confirmPasswordController,
+                  enabled: !_submitting,
                   hintText: 'Re-enter your password',
-                  prefixIcon: const Icon(
-                    Icons.verified_user_outlined,
-                    color: Color(0xFF94A3B8),
-                    size: 22,
-                  ),
-                  suffixIcon: IconButton(
-                    tooltip:
-                        _obscureConfirm ? 'Show password' : 'Hide password',
-                    onPressed: _submitting
-                        ? null
-                        : () => setState(
-                              () => _obscureConfirm = !_obscureConfirm,
-                            ),
-                    icon: Icon(
-                      _obscureConfirm
-                          ? Icons.visibility_outlined
-                          : Icons.visibility_off_outlined,
-                      color: const Color(0xFF94A3B8),
-                    ),
-                  ),
+                  prefixIcon: Icons.verified_user_outlined,
+                  textInputAction: TextInputAction.done,
+                  autofillHints: const [AutofillHints.newPassword],
+                  onFieldSubmitted: (_) {
+                    if (!_submitting) {
+                      _submit();
+                    }
+                  },
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Confirm your password';
+                    }
+                    if (value != _passwordController.text) {
+                      return 'Passwords do not match';
+                    }
+                    return null;
+                  },
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Confirm your password';
-                  }
-                  if (value != _passwordController.text) {
-                    return 'Passwords do not match';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              FilledButton(
-                onPressed: _submitting ? null : _submit,
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: AppColors.onPrimary,
-                  minimumSize: const Size.fromHeight(52),
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppRadius.md),
-                  ),
+                const SizedBox(height: AppSpacing.lg),
+                AuthPrimaryButton(
+                  label: 'Update password',
+                  loadingLabel: 'Updating…',
+                  loading: _submitting,
+                  onPressed: _submit,
                 ),
-                child: Text(
-                  _submitting ? 'Updating…' : 'Update Password',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-              const SizedBox(height: AppSpacing.lg),
-            ],
+                const SizedBox(height: AppSpacing.lg),
+              ],
+            ),
           ),
         ),
       ),

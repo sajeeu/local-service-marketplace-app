@@ -23,19 +23,16 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  var _obscurePassword = true;
-  var _obscureConfirm = true;
   var _agreedToTerms = false;
   var _submitting = false;
-  late final TapGestureRecognizer _logInRecognizer;
+  late final TapGestureRecognizer _signInRecognizer;
   late final TapGestureRecognizer _termsRecognizer;
   late final TapGestureRecognizer _privacyRecognizer;
 
   @override
   void initState() {
     super.initState();
-    _passwordController.addListener(() => setState(() {}));
-    _logInRecognizer = TapGestureRecognizer()
+    _signInRecognizer = TapGestureRecognizer()
       ..onTap = () {
         if (!_submitting) {
           context.go(AppRoutes.login);
@@ -53,7 +50,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
-    _logInRecognizer.dispose();
+    _signInRecognizer.dispose();
     _termsRecognizer.dispose();
     _privacyRecognizer.dispose();
     super.dispose();
@@ -79,7 +76,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         ..hideCurrentSnackBar()
         ..showSnackBar(
           const SnackBar(
-            content: Text('Please agree to the Terms of Service and Privacy Policy.'),
+            content: Text(
+              'Please agree to the Terms of Service and Privacy Policy.',
+            ),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -118,317 +117,199 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       horizontalPadding: AppSpacing.lg,
       body: Form(
         key: _formKey,
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SizedBox(height: AppSpacing.sm),
-              Row(
-                children: [
-                  IconButton(
-                    tooltip: 'Back to sign in',
-                    onPressed: _submitting
-                        ? null
-                        : () => context.go(AppRoutes.login),
-                    icon: const Icon(Icons.arrow_back_ios_new, size: 18),
-                    visualDensity: VisualDensity.compact,
+        child: AutofillGroup(
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(height: AppSpacing.sm),
+                AuthBackBrandHeader(
+                  backTooltip: 'Back to sign in',
+                  onBack: _submitting
+                      ? null
+                      : () => context.go(AppRoutes.login),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                const Divider(height: 1, color: AppColors.outline),
+                const SizedBox(height: AppSpacing.lg),
+                const AuthHeroBanner(),
+                const SizedBox(height: AppSpacing.lg),
+                const AuthPageTitle('Create account'),
+                const SizedBox(height: AppSpacing.sm),
+                AuthPageSubtitle(
+                  'Join $appName to find and book trusted local professionals '
+                  'across Malé, Hulhumalé, and islands throughout the Maldives.',
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                const AuthFieldLabel('Full name', required: true),
+                const SizedBox(height: AppSpacing.sm),
+                TextFormField(
+                  controller: _displayNameController,
+                  enabled: !_submitting,
+                  textInputAction: TextInputAction.next,
+                  textCapitalization: TextCapitalization.words,
+                  autofillHints: const [AutofillHints.name],
+                  decoration: authInputDecoration(
+                    hintText: 'Your full name',
+                    prefixIcon: const AuthFieldIcon(Icons.person_outline),
                   ),
-                  const Expanded(child: AppBrandHeader()),
-                  const SizedBox(width: 48),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.md),
-              const Divider(height: 1, color: AppColors.outline),
-              const SizedBox(height: AppSpacing.lg),
-              const AuthHeroBanner(),
-              const SizedBox(height: AppSpacing.lg),
-              const Text(
-                'Create Account',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.w700,
-                  height: 1.2,
-                  color: AppColors.onSurface,
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Full name is required';
+                    }
+                    return null;
+                  },
                 ),
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              Text(
-                'Join $appName to find and book trusted professionals in your neighborhood.',
-                style: const TextStyle(
-                  fontSize: 15,
-                  height: 1.4,
-                  color: AppColors.onSurfaceVariant,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              const AuthFieldLabel('Full Name', required: true),
-              const SizedBox(height: AppSpacing.sm),
-              TextFormField(
-                controller: _displayNameController,
-                enabled: !_submitting,
-                textInputAction: TextInputAction.next,
-                autofillHints: const [AutofillHints.name],
-                decoration: authInputDecoration(
-                  hintText: 'John Doe',
-                  prefixIcon: const Icon(
-                    Icons.person_outline,
-                    color: Color(0xFF94A3B8),
-                    size: 22,
+                const SizedBox(height: AppSpacing.md),
+                const AuthFieldLabel('Email address', required: true),
+                const SizedBox(height: AppSpacing.sm),
+                TextFormField(
+                  controller: _emailController,
+                  enabled: !_submitting,
+                  keyboardType: TextInputType.emailAddress,
+                  textInputAction: TextInputAction.next,
+                  autofillHints: const [AutofillHints.email],
+                  decoration: authInputDecoration(
+                    hintText: 'name@example.com',
+                    prefixIcon: const AuthFieldIcon(Icons.mail_outline),
                   ),
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Email is required';
+                    }
+                    if (!value.contains('@')) {
+                      return 'Enter a valid email';
+                    }
+                    return null;
+                  },
                 ),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Full name is required';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: AppSpacing.md),
-              const AuthFieldLabel('Email Address', required: true),
-              const SizedBox(height: AppSpacing.sm),
-              TextFormField(
-                controller: _emailController,
-                enabled: !_submitting,
-                keyboardType: TextInputType.emailAddress,
-                textInputAction: TextInputAction.next,
-                autofillHints: const [AutofillHints.email],
-                decoration: authInputDecoration(
-                  hintText: 'john@example.com',
-                  prefixIcon: const Icon(
-                    Icons.mail_outline,
-                    color: Color(0xFF94A3B8),
-                    size: 22,
-                  ),
-                ),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Email is required';
-                  }
-                  if (!value.contains('@')) {
-                    return 'Enter a valid email';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: AppSpacing.md),
-              const AuthFieldLabel('Password', required: true),
-              const SizedBox(height: AppSpacing.sm),
-              TextFormField(
-                controller: _passwordController,
-                enabled: !_submitting,
-                obscureText: _obscurePassword,
-                textInputAction: TextInputAction.next,
-                autofillHints: const [AutofillHints.newPassword],
-                decoration: authInputDecoration(
+                const SizedBox(height: AppSpacing.md),
+                const AuthFieldLabel('Password', required: true),
+                const SizedBox(height: AppSpacing.sm),
+                AuthPasswordField(
+                  controller: _passwordController,
+                  enabled: !_submitting,
                   hintText: 'Create a password',
-                  prefixIcon: const Icon(
-                    Icons.lock_outline,
-                    color: Color(0xFF94A3B8),
-                    size: 22,
-                  ),
-                  suffixIcon: IconButton(
-                    tooltip: _obscurePassword
-                        ? 'Show password'
-                        : 'Hide password',
-                    onPressed: _submitting
-                        ? null
-                        : () => setState(
-                              () => _obscurePassword = !_obscurePassword,
-                            ),
-                    icon: Icon(
-                      _obscurePassword
-                          ? Icons.visibility_outlined
-                          : Icons.visibility_off_outlined,
-                      color: const Color(0xFF94A3B8),
-                    ),
-                  ),
+                  textInputAction: TextInputAction.next,
+                  autofillHints: const [AutofillHints.newPassword],
+                  validator: (value) {
+                    if (value == null || value.length < 8) {
+                      return 'Password must be at least 8 characters';
+                    }
+                    return null;
+                  },
                 ),
-                validator: (value) {
-                  if (value == null || value.length < 8) {
-                    return 'Password must be at least 8 characters';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              PasswordStrengthMeter(password: _passwordController.text),
-              const SizedBox(height: AppSpacing.md),
-              const AuthFieldLabel('Confirm Password', required: true),
-              const SizedBox(height: AppSpacing.sm),
-              TextFormField(
-                controller: _confirmPasswordController,
-                enabled: !_submitting,
-                obscureText: _obscureConfirm,
-                textInputAction: TextInputAction.done,
-                autofillHints: const [AutofillHints.newPassword],
-                onFieldSubmitted: (_) {
-                  if (!_submitting) {
-                    _submit();
-                  }
-                },
-                decoration: authInputDecoration(
+                const SizedBox(height: AppSpacing.sm),
+                ListenableBuilder(
+                  listenable: _passwordController,
+                  builder: (context, _) {
+                    return PasswordStrengthMeter(
+                      password: _passwordController.text,
+                    );
+                  },
+                ),
+                const SizedBox(height: AppSpacing.md),
+                const AuthFieldLabel('Confirm password', required: true),
+                const SizedBox(height: AppSpacing.sm),
+                AuthPasswordField(
+                  controller: _confirmPasswordController,
+                  enabled: !_submitting,
                   hintText: 'Re-enter your password',
-                  prefixIcon: const Icon(
-                    Icons.verified_user_outlined,
-                    color: Color(0xFF94A3B8),
-                    size: 22,
-                  ),
-                  suffixIcon: IconButton(
-                    tooltip:
-                        _obscureConfirm ? 'Show password' : 'Hide password',
-                    onPressed: _submitting
-                        ? null
-                        : () => setState(
-                              () => _obscureConfirm = !_obscureConfirm,
-                            ),
-                    icon: Icon(
-                      _obscureConfirm
-                          ? Icons.visibility_outlined
-                          : Icons.visibility_off_outlined,
-                      color: const Color(0xFF94A3B8),
-                    ),
-                  ),
+                  prefixIcon: Icons.verified_user_outlined,
+                  textInputAction: TextInputAction.done,
+                  autofillHints: const [AutofillHints.newPassword],
+                  onFieldSubmitted: (_) {
+                    if (!_submitting) {
+                      _submit();
+                    }
+                  },
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Confirm your password';
+                    }
+                    if (value != _passwordController.text) {
+                      return 'Passwords do not match';
+                    }
+                    return null;
+                  },
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Confirm your password';
-                  }
-                  if (value != _passwordController.text) {
-                    return 'Passwords do not match';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: AppSpacing.md),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    width: 22,
-                    height: 22,
-                    child: Checkbox(
-                      value: _agreedToTerms,
-                      onChanged: _submitting
-                          ? null
-                          : (value) => setState(
-                                () => _agreedToTerms = value ?? false,
-                              ),
-                      side: const BorderSide(
-                        color: AppColors.outline,
-                        width: 1.5,
-                      ),
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      visualDensity: VisualDensity.compact,
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                  Expanded(
-                    child: Text.rich(
-                      TextSpan(
-                        style: const TextStyle(
-                          fontSize: 13,
-                          height: 1.4,
-                          color: AppColors.onSurfaceVariant,
-                        ),
-                        children: [
-                          const TextSpan(text: 'I agree to the '),
-                          TextSpan(
-                            text: 'Terms of Service',
-                            style: const TextStyle(
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.w600,
-                            ),
-                            recognizer: _termsRecognizer,
+                const SizedBox(height: AppSpacing.md),
+                AuthCheckboxRow(
+                  value: _agreedToTerms,
+                  enabled: !_submitting,
+                  onChanged: (value) =>
+                      setState(() => _agreedToTerms = value ?? false),
+                  child: Text.rich(
+                    TextSpan(
+                      style: AppTypography.bodySmall.copyWith(fontSize: 13),
+                      children: [
+                        const TextSpan(text: 'I agree to the '),
+                        TextSpan(
+                          text: 'Terms of Service',
+                          style: const TextStyle(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w600,
                           ),
-                          const TextSpan(text: ' and '),
-                          TextSpan(
-                            text: 'Privacy Policy',
-                            style: const TextStyle(
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.w600,
-                            ),
-                            recognizer: _privacyRecognizer,
+                          recognizer: _termsRecognizer,
+                        ),
+                        const TextSpan(text: ' and '),
+                        TextSpan(
+                          text: 'Privacy Policy',
+                          style: const TextStyle(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w600,
                           ),
-                          const TextSpan(text: '.'),
-                        ],
-                      ),
+                          recognizer: _privacyRecognizer,
+                        ),
+                        const TextSpan(text: '.'),
+                      ],
                     ),
                   ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              FilledButton(
-                onPressed: _submitting ? null : _submit,
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: AppColors.onPrimary,
-                  minimumSize: const Size.fromHeight(52),
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppRadius.md),
-                  ),
                 ),
-                child: _submitting
-                    ? const Text(
-                        'Creating…',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      )
-                    : const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'Sign Up',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                            ),
+                const SizedBox(height: AppSpacing.lg),
+                AuthPrimaryButton(
+                  label: 'Sign up',
+                  loadingLabel: 'Creating account…',
+                  loading: _submitting,
+                  showTrailingArrow: true,
+                  onPressed: _submit,
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                Center(
+                  child: Text.rich(
+                    TextSpan(
+                      style: AppTypography.bodySmall,
+                      children: [
+                        const TextSpan(text: 'Already have an account? '),
+                        TextSpan(
+                          text: 'Sign in',
+                          style: const TextStyle(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w700,
                           ),
-                          SizedBox(width: AppSpacing.sm),
-                          Icon(Icons.arrow_forward, size: 18),
-                        ],
-                      ),
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              Center(
-                child: Text.rich(
-                  TextSpan(
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: AppColors.onSurfaceVariant,
-                    ),
-                    children: [
-                      const TextSpan(text: 'Already have an account? '),
-                      TextSpan(
-                        text: 'Log In',
-                        style: const TextStyle(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.w700,
+                          recognizer: _signInRecognizer,
                         ),
-                        recognizer: _logInRecognizer,
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              const SecureRegistrationBanner(),
-              const SizedBox(height: AppSpacing.md),
-              TextButton.icon(
-                onPressed: _submitting
-                    ? null
-                    : () => _showComingSoon('Support'),
-                icon: const Icon(Icons.info_outline, size: 18),
-                label: const Text('Need help? Contact support'),
-                style: TextButton.styleFrom(
-                  foregroundColor: AppColors.onSurfaceVariant,
+                const SizedBox(height: AppSpacing.lg),
+                const SecureRegistrationBanner(),
+                const SizedBox(height: AppSpacing.md),
+                TextButton.icon(
+                  onPressed: _submitting
+                      ? null
+                      : () => _showComingSoon('Support'),
+                  icon: const Icon(Icons.info_outline, size: 18),
+                  label: const Text('Need help? Contact support'),
+                  style: TextButton.styleFrom(
+                    minimumSize: const Size(48, 44),
+                    foregroundColor: AppColors.onSurfaceVariant,
+                  ),
                 ),
-              ),
-              const SizedBox(height: AppSpacing.lg),
-            ],
+                const SizedBox(height: AppSpacing.lg),
+              ],
+            ),
           ),
         ),
       ),
