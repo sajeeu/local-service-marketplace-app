@@ -33,7 +33,7 @@ async function main() {
     console.log('Seed complete.');
     console.log(`Default password for seeded users: ${SEED_PASSWORD}`);
     console.log(
-      'Accounts: admin@seed.maldives.local, plumbing@seed.maldives.local, tuition@seed.maldives.local, photography@seed.maldives.local, nocoverage@seed.maldives.local, customer@seed.maldives.local',
+      'Accounts: admin@seed.maldives.local, plumbing@seed.maldives.local, cleaning@seed.maldives.local, photography@seed.maldives.local, nocoverage@seed.maldives.local, customer@seed.maldives.local',
     );
   } finally {
     await prisma.$disconnect();

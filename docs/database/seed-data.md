@@ -45,16 +45,16 @@ All seeded users share: `SeedPassword123!`
 | --- | --- |
 | `admin@seed.maldives.local` | Administrator |
 | `plumbing@seed.maldives.local` | Provider: Malé Plumbing Experts |
-| `tuition@seed.maldives.local` | Provider: Island Tuition Academy |
+| `cleaning@seed.maldives.local` | Provider: Hulhumalé Cleaning Experts |
 | `photography@seed.maldives.local` | Provider: Atoll Photography Services |
 | `nocoverage@seed.maldives.local` | Provider: New Island Services (empty coverage) |
 | `customer@seed.maldives.local` | Customer profile |
 
 ### Categories
 
-Parents: Home Services, Education, Personal Services, Technology, plus inactive `Legacy Services`.
+Parents: Home Services, Auto Services, Personal Services, Technology, plus inactive `Legacy Services`.
 
-Children include Plumbing, Electrical, AC Repair, Cleaning, Painting, Carpentry, Appliance Repair, Gardening, Tuition, Language, Computer Training, Music, Beauty, Fitness, Photography, Event Services, Computer Repair, Phone Repair, IT Support.
+Children include Plumbing, Electrical, AC Repair, Cleaning, Painting, Carpentry, Appliance Repair, Gardening, Home Maintenance, Moving Services, Landscaping, Vehicle Repair, Auto Detailing, Roadside Assistance, Beauty, Fitness, Photography, Event Services, Computer Repair, Phone Repair, IT Support.
 
 ### Geography
 
@@ -67,10 +67,10 @@ Islands include Malé, Hulhumalé, Villingili, Maafushi, Thulusdhoo, Addu City i
 | Provider | Coverage |
 | --- | --- |
 | Malé Plumbing Experts | Malé, Hulhumalé |
-| Island Tuition Academy | Malé |
+| Hulhumalé Cleaning Experts | Hulhumalé |
 | Atoll Photography Services | All active Kaafu islands |
 | New Island Services | None (empty state) |
 
 ## Idempotency
 
-Seeds upsert by natural keys (`email`, `slug`, `code`, `userId`). Re-running `db:seed` does not duplicate rows. Coverage is replaced per provider on each seed run.
+Seeds upsert by natural keys (`email`, `slug`, `code`, `userId`). Re-running `db:seed` does not duplicate rows. Coverage is replaced per provider on each seed run. Retired education category slugs and legacy tuition seed accounts are deleted on each seed run.

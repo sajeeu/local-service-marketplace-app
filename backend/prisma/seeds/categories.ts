@@ -10,6 +10,15 @@ type CategorySeed = {
   children?: Omit<CategorySeed, 'children'>[];
 };
 
+/** Removed education taxonomy — deleted on each seed for idempotent cleanup. */
+const REMOVED_CATEGORY_SLUGS = [
+  'tuition-classes',
+  'language-classes',
+  'computer-training',
+  'music-lessons',
+  'education',
+] as const;
+
 const CATEGORY_TREE: CategorySeed[] = [
   {
     slug: 'home-services',
@@ -70,46 +79,60 @@ const CATEGORY_TREE: CategorySeed[] = [
       {
         slug: 'gardening',
         name: 'Gardening',
-        description: 'Garden care and landscaping.',
+        description: 'Garden care and plant maintenance.',
         icon: 'gardening',
         displayOrder: 8,
+      },
+      {
+        slug: 'home-maintenance',
+        name: 'Home Maintenance',
+        description: 'General home upkeep and handyman work.',
+        icon: 'maintenance',
+        displayOrder: 9,
+      },
+      {
+        slug: 'moving-services',
+        name: 'Moving Services',
+        description: 'Local moving and relocation help.',
+        icon: 'moving',
+        displayOrder: 10,
+      },
+      {
+        slug: 'landscaping',
+        name: 'Landscaping',
+        description: 'Outdoor design and landscaping.',
+        icon: 'landscaping',
+        displayOrder: 11,
       },
     ],
   },
   {
-    slug: 'education',
-    name: 'Education',
-    description: 'Tuition and skills training.',
-    icon: 'education',
+    slug: 'auto-services',
+    name: 'Auto Services',
+    description: 'Vehicle repair, detailing, and roadside help.',
+    icon: 'auto',
     displayOrder: 20,
     children: [
       {
-        slug: 'tuition-classes',
-        name: 'Tuition Classes',
-        description: 'Subject tutoring for students.',
-        icon: 'tuition',
+        slug: 'vehicle-repair',
+        name: 'Vehicle Repair',
+        description: 'Car and motorcycle mechanical repairs.',
+        icon: 'vehicle-repair',
         displayOrder: 1,
       },
       {
-        slug: 'language-classes',
-        name: 'Language Classes',
-        description: 'Language learning and conversation.',
-        icon: 'language',
+        slug: 'auto-detailing',
+        name: 'Auto Detailing',
+        description: 'Vehicle wash and detailing.',
+        icon: 'auto-detailing',
         displayOrder: 2,
       },
       {
-        slug: 'computer-training',
-        name: 'Computer Training',
-        description: 'IT literacy and software skills.',
-        icon: 'computer-training',
+        slug: 'roadside-assistance',
+        name: 'Roadside Assistance',
+        description: 'Breakdown and roadside support.',
+        icon: 'roadside',
         displayOrder: 3,
-      },
-      {
-        slug: 'music-lessons',
-        name: 'Music Lessons',
-        description: 'Instrument and vocal lessons.',
-        icon: 'music',
-        displayOrder: 4,
       },
     ],
   },
@@ -229,8 +252,15 @@ async function upsertCategory(
   }
 }
 
+async function removeRetiredCategories(ctx: SeedContext) {
+  for (const slug of REMOVED_CATEGORY_SLUGS) {
+    await ctx.prisma.category.deleteMany({ where: { slug } });
+  }
+}
+
 export async function seedCategories(ctx: SeedContext) {
   for (const root of CATEGORY_TREE) {
     await upsertCategory(ctx, root, null);
   }
+  await removeRetiredCategories(ctx);
 }

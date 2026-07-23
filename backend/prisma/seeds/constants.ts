@@ -16,18 +16,24 @@ export const SEED_IDS = {
   users: {
     admin: 'seed_user_admin',
     plumbing: 'seed_user_plumbing',
-    tuition: 'seed_user_tuition',
+    cleaning: 'seed_user_cleaning',
     photography: 'seed_user_photography',
     emptyCoverage: 'seed_user_empty_coverage',
     customer: 'seed_user_customer',
   },
   providers: {
     plumbing: 'seed_provider_plumbing',
-    tuition: 'seed_provider_tuition',
+    cleaning: 'seed_provider_cleaning',
     photography: 'seed_provider_photography',
     emptyCoverage: 'seed_provider_empty',
   },
   customer: 'seed_customer_profile',
+} as const;
+
+/** Legacy tuition seed IDs — removed on each seed for idempotent cleanup. */
+export const LEGACY_TUITION_SEED_IDS = {
+  user: 'seed_user_tuition',
+  provider: 'seed_provider_tuition',
 } as const;
 
 let cachedPasswordHash: string | null = null;

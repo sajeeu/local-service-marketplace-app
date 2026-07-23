@@ -6,7 +6,6 @@ import 'package:frontend/features/geography/state/geography_providers.dart';
 import 'package:frontend/features/providers/data/provider_coverage_api.dart';
 import 'package:frontend/features/providers/data/provider_coverage_models.dart';
 import 'package:frontend/features/providers/presentation/edit_provider_coverage_screen.dart';
-import 'package:frontend/features/providers/state/provider_coverage_provider.dart';
 import 'package:go_router/go_router.dart';
 
 class _FakeCoverageApi implements ProviderCoverageApi {

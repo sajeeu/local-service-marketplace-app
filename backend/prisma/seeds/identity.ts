@@ -1,4 +1,5 @@
 import {
+  LEGACY_TUITION_SEED_IDS,
   ProfileStatus,
   SEED_IDS,
   UserRole,
@@ -6,8 +7,29 @@ import {
   type SeedContext,
 } from './constants';
 
+async function removeLegacyTuitionAccount(ctx: SeedContext) {
+  const { prisma } = ctx;
+  const { user: legacyUserId, provider: legacyProviderId } =
+    LEGACY_TUITION_SEED_IDS;
+
+  await prisma.providerIslandCoverage.deleteMany({
+    where: { providerProfileId: legacyProviderId },
+  });
+  await prisma.providerProfile.deleteMany({
+    where: { id: legacyProviderId },
+  });
+  await prisma.refreshToken.deleteMany({
+    where: { userId: legacyUserId },
+  });
+  await prisma.user.deleteMany({
+    where: { id: legacyUserId },
+  });
+}
+
 export async function seedIdentity(ctx: SeedContext) {
   const { prisma, passwordHash } = ctx;
+
+  await removeLegacyTuitionAccount(ctx);
 
   const users = [
     {
@@ -23,9 +45,9 @@ export async function seedIdentity(ctx: SeedContext) {
       role: UserRole.CUSTOMER,
     },
     {
-      id: SEED_IDS.users.tuition,
-      email: 'tuition@seed.maldives.local',
-      displayName: 'Fathimath Tutor',
+      id: SEED_IDS.users.cleaning,
+      email: 'cleaning@seed.maldives.local',
+      displayName: 'Mariyam Cleaning',
       role: UserRole.CUSTOMER,
     },
     {

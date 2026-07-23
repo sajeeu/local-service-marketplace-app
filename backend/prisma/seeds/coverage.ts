@@ -39,8 +39,8 @@ export async function seedCoverage(ctx: SeedContext) {
   // Malé Plumbing Experts → Malé + Hulhumalé
   await setCoverage(ctx, SEED_IDS.providers.plumbing, ['male', 'hulhumale']);
 
-  // Island Tuition Academy → Malé only
-  await setCoverage(ctx, SEED_IDS.providers.tuition, ['male']);
+  // Hulhumalé Cleaning Experts → Hulhumalé only
+  await setCoverage(ctx, SEED_IDS.providers.cleaning, ['hulhumale']);
 
   // Atoll Photography → all active Kaafu islands (atoll-wide snapshot)
   const kaafu = await prisma.atoll.findUnique({ where: { code: 'K' } });

@@ -116,7 +116,7 @@ Evaluate:
 
 Examples — a customer should easily understand:
 
-- "Tuition classes available in Malé"
+- "AC repair available in Malé"
 - "Plumbing service available in Hulhumalé"
 - "Provider serves multiple islands"
 
